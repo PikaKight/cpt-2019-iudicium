@@ -2,8 +2,9 @@
 Program description. Replace with description of your program. Give a description of each scene.
 
 ### Group Members:
-- Member1
-- Member2
+- Marucs Tuen Muk
+- Stella Hong
+- Yunze Li
 
 
 # CPT 2019
