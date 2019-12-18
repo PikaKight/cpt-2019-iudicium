@@ -28,10 +28,10 @@ class Director(arcade.Window):
         self.show_view(next_view)
         self.view_index = (self.view_index + 1) % len(self.views)
 
-
 def main():
     window = Director(settings.WIDTH, settings.HEIGHT, "CPT Structure")
     arcade.run()
+    
 
 
 if __name__ == "__main__":
