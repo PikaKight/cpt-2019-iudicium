@@ -1,6 +1,4 @@
 import arcade
-import pyglet
-from pathlib import Path
 
 import settings
 
@@ -16,22 +14,7 @@ class Ch3View(arcade.View):
 
     def on_key_press(self, key, modifiers):
         self.director.next_view()
-
-
-class Sound:
-
-    def __init__(self, file_name: str):
-        if not Path(file_name).is_file():
-            raise FileNotFoundError(f"The sound file '{file_name}' is not a file or can't be read")
-        self.file_name = file_name
-        self.player = pyglet.media.load(file_name)
-
-    def play(self):
-        if self.player.is_queued:
-            player = pyglet.media.load(self.file_name)
-            player.play()
-        else:
-            self.player.play()
+ 
            
 if __name__ == "__main__":
     """This section of code will allow you to run your View
@@ -48,6 +31,7 @@ if __name__ == "__main__":
     my_view = Ch3View()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
-    arcade.run()
-    music = Sound("End_of_Time.mp3")
+    music = arcade.Sound("End_of_Time.mp3")
     music.play()
+    arcade.run()
+
