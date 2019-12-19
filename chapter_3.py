@@ -4,6 +4,11 @@ import settings
 
 
 class Ch3View(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.music = arcade.Sound("End_of_Time.mp3")
+        self.music.play()
+          
     def on_show(self):
         arcade.set_background_color(arcade.color.WHITE)
 
