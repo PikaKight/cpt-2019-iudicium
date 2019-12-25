@@ -14,13 +14,15 @@ class Ch3View(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_rectangle_outline(200, 450, 100, 50, arcade.color.AZURE)
-        arcade.draw_rectangle_outline(175, 425, 50, 100, arcade.color.AZURE)
-        arcade.draw_rectangle_outline(200, 215, 100, 50, arcade.color.AZURE)
-        arcade.draw_rectangle_outline(175, 240, 50, 100, arcade.color.AZURE)
-        arcade.draw_rectangle_outline(575, 450, 100, 50, arcade.color.AZURE)
-        arcade.draw_rectangle_outline(600, 425, 50, 100, arcade.color.AZURE)
-
+        arcade.draw_rectangle_outline(200, 475, 100, 50, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(175, 450, 50, 100, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(200, 125, 100, 50, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(175, 150, 50, 100, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(575, 475, 100, 50, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(600, 450, 50, 100, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(575, 125, 100, 50, arcade.color.AZURE)
+        arcade.draw_rectangle_outline(600, 150, 50, 100, arcade.color.AZURE)
+        
     def on_key_press(self, key, modifiers):
         self.director.next_view()
  
