@@ -1,18 +1,31 @@
 import arcade
-
+import random
 import settings
+
+
+class balls:
+    def __init__(self, center_x=random.randrange(50, 750),
+                center_y=random.randrange(50, 550), radius=20,
+                color=arcade.color.BLACK):
+        pass
+    def draw(self):
+        for i in range(5):
+            arcade.draw_circle_filled()
 
 
 class Chapter4View(arcade.View):
     def __init__(self):
         super().__init__()
     def on_show(self):
-        arcade.set_background_color(arcade.color.WHITE)
+        arcade.set_background_color(arcade.color.GHOST_WHITE)
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2,
-                         arcade.color.BLACK, font_size=30, anchor_x="center")
+        # arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2,
+        #                  arcade.color.BLACK, font_size=30, anchor_x="center")
+
+        balls()
+
 
     def on_key_press(self, key, modifiers):
         self.director.next_view()
