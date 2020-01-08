@@ -1,15 +1,53 @@
 import arcade
 
 import settings
+speed = 6
+
+class Char:
+    def __init__(self, color, position_x, position_y, radius):
+        # Take the parameters of the init function above, and create instance variables out of them.
+        self.position_x = position_x
+        self.position_y = position_y
+        self.change_x = 0
+        self.change_y = 0
+        self.radius = radius
+        self.color = color
+        self.sprite_main = arcade.Sprite(center_x=self.position_x, center_y=self.position_y)
+        self.sprite_main.texture = arcade.make_circle_texture(self.radius, self.color)
+
+    def draw(self):
+        """ Draw the balls with the instance variables we have. """
+        self.sprite_main.draw()
+
+    def update(self):
+        # Move the ball
+        self.position_y += self.change_y
+        print(self.position_y, self.change_y)
+        self.position_x += self.change_x
+    
+        # See if the ball hit the edge of the screen. If so, change direction
+        if self.position_x < self.radius:
+            self.position_x = self.radius
+
+        if self.position_x > settings.WIDTH - self.radius:
+            self.position_x = settings.WIDTH - self.radius
+
+        if self.position_y < self.radius:
+            self.position_y = self.radius
+
+        if self.position_y > settings.HEIGHT - self.radius:
+            self.position_y = settings.HEIGHT - self.radius
 
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
+        self.x = 0
         # self.music = arcade.Sound("End_of_Time.mp3")
         # self.music.play()
         self.sprite_main = arcade.Sprite(center_x=400, center_y=300)
         self.sprite_main.texture = arcade.make_circle_texture(50, arcade.color.AMAZON)
-          
+        # Char(arcade.color.AMAZON, 400, 300, 50)
+ 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
 
@@ -29,11 +67,48 @@ class Ch3View(arcade.View):
         arcade.draw_circle_filled(750, 50, 50, arcade.color.WHITE)
         arcade.draw_circle_filled(750, 550, 50, arcade.color.WHITE)
         self.sprite_main.draw()
+        if self.x == 1:
+            arcade.draw_rectangle_outline(400, 200, 700, 300, arcade.color.AERO_BLUE, 3)
+            arcade.draw_rectangle_filled(400,200,697,297,arcade.color.BLACK)
+            arcade.draw_text("Hello", 400, 300, arcade.color.WHITE, 40, 0, align="left", font_name="Comic Sans")
         
-        
+    
+    def update(self, delta_time):
+        self.sprite_main.update()
+    
     def on_key_press(self, key, modifiers):
-        self.director.next_view()
- 
+
+        if key == arcade.key.W:
+            self.sprite_main.change_y = speed
+            print(self.sprite_main.center_x, self.sprite_main.center_y)
+
+        elif key == arcade.key.S:
+            self.sprite_main.change_y = -speed
+            print(self.sprite_main.center_x, self.sprite_main.center_y)
+        
+        elif key == arcade.key.A:
+            self.sprite_main.change_x = -speed
+            print(self.sprite_main.center_x, self.sprite_main.center_y)
+        
+        elif key == arcade.key.D:
+            self.sprite_main.change_x = speed
+            print(self.sprite_main.center_x, self.sprite_main.center_y)
+
+        if (self.sprite_main.center_x  >= 340 and self.sprite_main.center_x <= 460) and (self.sprite_main.center_y >= 555):
+            if key == arcade.key.SPACE:
+                print("hi")
+                self.x = 1
+
+
+    def on_key_release(self, key, modifiers):
+        """ Called whenever a user releases a key. """
+        if key == arcade.key.A or key == arcade.key.D:
+            self.sprite_main.change_x = 0
+
+        elif key == arcade.key.W or key == arcade.key.S:
+            self.sprite_main.change_y = 0
+
+
            
 if __name__ == "__main__":
     """This section of code will allow you to run your View
