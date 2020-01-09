@@ -14,7 +14,7 @@ class Chapter4View(arcade.View):
         # Player Sprite
         player_sprite = "ch4_Sprites/alienBlue_front.png"
 
-        self.player = arcade.Sprite(player_sprite, 0.5)
+        self.player = arcade.Sprite(player_sprite, 0.3)
         self.player.center_x = 100
         self.player.center_y = 200
 
@@ -32,7 +32,8 @@ class Chapter4View(arcade.View):
         self.player.update()
 
     def on_key_press(self, key, modifiers):
-        # self.director.next_view()
+        if key == arcade.key.ESCAPE:
+            self.director.next_view()
 
         if key == arcade.key.UP:
             self.player.change_y = player_speedy
@@ -41,7 +42,7 @@ class Chapter4View(arcade.View):
         elif key == arcade.key.RIGHT:
             self.player.change_x = player_speedx
         elif key == arcade.key.LEFT:
-            self.player.change_x = -player_speedx
+            self.player.change_x = -player_speedx            
 
 
     def on_key_release(self, key, modifiers):
