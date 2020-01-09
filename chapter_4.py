@@ -3,6 +3,10 @@ import random
 import settings
 
 
+player_speedx = 5
+player_speedy = 5
+
+
 class Chapter4View(arcade.View):
     def __init__(self):
         super().__init__()
@@ -10,7 +14,7 @@ class Chapter4View(arcade.View):
         # Player Sprite
         player_sprite = "ch4_Sprites/alienBlue_front.png"
 
-        self.player = arcade.Sprite(player_sprite, 1)
+        self.player = arcade.Sprite(player_sprite, 0.5)
         self.player.center_x = 100
         self.player.center_y = 200
 
@@ -25,7 +29,27 @@ class Chapter4View(arcade.View):
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
-        self.director.next_view()
+        # self.director.next_view()
+
+        if key == arcade.key.UP:
+            self.player.change_y = player_speedy
+        elif key == arcade.key.DOWN:
+            self.player.change_y = -player_speedy
+        elif key == arcade.key.RIGHT:
+            self.player.change_x = player_speedx
+        elif key == arcade.key.LEFT:
+            self.player.change_x = -player_speedx
+
+    def on_key_release(self, key, modifiers):
+        # self.director.next_view()
+
+        if key == arcade.key.UP or key == arcade.key.DOWN:
+            self.player.change_y = 0
+            self.player.change_y = 0
+        elif key == arcade.key.RIGHT or key == arcade.key.LEFT:
+            self.player.change_x = 0
+            self.player.change_x = 0
+
 
 
 if __name__ == "__main__":
