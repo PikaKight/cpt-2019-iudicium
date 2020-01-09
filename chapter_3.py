@@ -3,41 +3,6 @@ import arcade
 import settings
 speed = 6
 
-class Char:
-    def __init__(self, color, position_x, position_y, radius):
-        # Take the parameters of the init function above, and create instance variables out of them.
-        self.position_x = position_x
-        self.position_y = position_y
-        self.change_x = 0
-        self.change_y = 0
-        self.radius = radius
-        self.color = color
-        self.sprite_main = arcade.Sprite(center_x=self.position_x, center_y=self.position_y)
-        self.sprite_main.texture = arcade.make_circle_texture(self.radius, self.color)
-
-    def draw(self):
-        """ Draw the balls with the instance variables we have. """
-        self.sprite_main.draw()
-
-    def update(self):
-        # Move the ball
-        self.position_y += self.change_y
-        print(self.position_y, self.change_y)
-        self.position_x += self.change_x
-    
-        # See if the ball hit the edge of the screen. If so, change direction
-        if self.position_x < self.radius:
-            self.position_x = self.radius
-
-        if self.position_x > settings.WIDTH - self.radius:
-            self.position_x = settings.WIDTH - self.radius
-
-        if self.position_y < self.radius:
-            self.position_y = self.radius
-
-        if self.position_y > settings.HEIGHT - self.radius:
-            self.position_y = settings.HEIGHT - self.radius
-
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
@@ -49,9 +14,9 @@ class Ch3View(arcade.View):
         self.color_4 = arcade.color.WHITE
         # self.music = arcade.Sound("End_of_Time.mp3")
         # self.music.play()
-        self.sprite_main = arcade.Sprite(center_x=400, center_y=300)
-        self.sprite_main.texture = arcade.make_circle_texture(50, arcade.color.AMAZON)
-        # Char(arcade.color.AMAZON, 400, 300, 50)
+        self.player = arcade.Sprite("ch4_Sprites/alienBlue_front.png", .4)
+        self.player.center_x = 400
+        self.player.center_y = 300
  
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -71,7 +36,7 @@ class Ch3View(arcade.View):
         arcade.draw_circle_filled(50, 550, 50, self.color_1) # min 100 max 110 x, min 500 y
         arcade.draw_circle_filled(750, 50, 50, self.color_3) # min 690 max 700 x, min 500 y
         arcade.draw_circle_filled(750, 550, 50, self.color_4) # min 690 max 700 x, min 100 max 90 y 
-        self.sprite_main.draw()
+        self.player.draw()
         if self.x == 1:
             arcade.draw_rectangle_outline(400, 200, 700, 300, arcade.color.AERO_BLUE, 3)
             arcade.draw_rectangle_filled(400,200,697,297,arcade.color.BLACK)
@@ -79,70 +44,70 @@ class Ch3View(arcade.View):
         
     
     def update(self, delta_time):
-        self.sprite_main.update()
+        self.player.update()
     
     def on_key_press(self, key, modifiers):
 
         if key == arcade.key.W:
-            self.sprite_main.change_y = speed
-            print(self.sprite_main.center_x, self.sprite_main.center_y)
+            self.player.change_y = speed
+            print(self.player.center_x, self.player.center_y)
 
         elif key == arcade.key.S:
-            self.sprite_main.change_y = -speed
-            print(self.sprite_main.center_x, self.sprite_main.center_y)
+            self.player.change_y = -speed
+            print(self.player.center_x, self.player.center_y)
         
         elif key == arcade.key.A:
-            self.sprite_main.change_x = -speed
-            print(self.sprite_main.center_x, self.sprite_main.center_y)
+            self.player.change_x = -speed
+            print(self.player.center_x, self.player.center_y)
         
         elif key == arcade.key.D:
-            self.sprite_main.change_x = speed
-            print(self.sprite_main.center_x, self.sprite_main.center_y)
+            self.player.change_x = speed
+            print(self.player.center_x, self.player.center_y)
         
         if key == arcade.key.SPACE:
-            if (self.sprite_main.center_x  >= 340 and self.sprite_main.center_x <= 460) and (self.sprite_main.center_y >= 555):
+            if (self.player.center_x  >= 340 and self.player.center_x <= 460) and (self.player.center_y >= 555):
                 print("hi")
                 self.x = 1
 
-            elif (self.sprite_main.center_x  >= 0 and self.sprite_main.center_x <= 110) and (self.sprite_main.center_y >= 500) and  self.puzzle_action == 0:
+            elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 500) and  self.puzzle_action == 0:
                 self.color_1 = arcade.color.GREEN
                 self.puzzle_action = 1
 
-            elif (self.sprite_main.center_x  >= 0 and self.sprite_main.center_x <= 110) and (self.sprite_main.center_y >= 500) and  self.puzzle_action == 1:
+            elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 500) and  self.puzzle_action == 1:
                 self.color_1 = arcade.color.WHITE
                 self.puzzle_action = 0
 
-            elif (self.sprite_main.center_x  >= 0 and self.sprite_main.center_x <= 110) and (self.sprite_main.center_y >= 100 and self.sprite_main.center_y <= 90) and  self.puzzle_action == 0:
+            elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 0:
                 self.color_2 = arcade.color.GREEN
                 self.puzzle_action = 1
 
-            elif (self.sprite_main.center_x  >= 0 and self.sprite_main.center_x <= 110) and (self.sprite_main.center_y >= 100 and self.sprite_main.center_y <= 90) and  self.puzzle_action == 1:
+            elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 1:
                 self.color_2 = arcade.color.WHITE
                 self.puzzle_action = 0
             
-            elif (self.sprite_main.center_x  >= 690 and self.sprite_main.center_x <= 700) and (self.sprite_main.center_y >= 500) and  self.puzzle_action == 0:
+            elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and  self.puzzle_action == 0:
                 self.color_3 = arcade.color.GREEN
                 self.puzzle_action = 1
 
-            elif (self.sprite_main.center_x  >= 690 and self.sprite_main.center_x <= 700) and (self.sprite_main.center_y >= 500) and  self.puzzle_action == 1:
+            elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and  self.puzzle_action == 1:
                 self.color_3 = arcade.color.WHITE
                 self.puzzle_action = 0
 
-            elif (self.sprite_main.center_x  >= 690 and self.sprite_main.center_x <= 700) and (self.sprite_main.center_y >= 100 and self.sprite_main.center_y <= 90) and  self.puzzle_action == 0:
+            elif (self.player.center_x  >= 690 and self.position_x.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 0:
                 self.color_4 = arcade.color.GREEN
                 self.puzzle_action = 1
 
-            elif (self.sprite_main.center_x  >= 690 and self.sprite_main.center_x <= 700) and (self.sprite_main.center_y >= 100 and self.sprite_main.center_y <= 90) and  self.puzzle_action == 1:
+            elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 1:
                 self.color_4 = arcade.color.WHITE
                 self.puzzle_action = 0
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
         if key == arcade.key.A or key == arcade.key.D:
-            self.sprite_main.change_x = 0
+            self.player.change_x = 0
 
         elif key == arcade.key.W or key == arcade.key.S:
-            self.sprite_main.change_y = 0
+            self.player.change_y = 0
 
 
            
