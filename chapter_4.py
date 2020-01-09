@@ -28,6 +28,9 @@ class Chapter4View(arcade.View):
 
         self.player.draw()
 
+    def update(self, delta_time):
+        self.player.update()
+
     def on_key_press(self, key, modifiers):
         # self.director.next_view()
 
@@ -40,14 +43,13 @@ class Chapter4View(arcade.View):
         elif key == arcade.key.LEFT:
             self.player.change_x = -player_speedx
 
+
     def on_key_release(self, key, modifiers):
         # self.director.next_view()
 
         if key == arcade.key.UP or key == arcade.key.DOWN:
             self.player.change_y = 0
-            self.player.change_y = 0
         elif key == arcade.key.RIGHT or key == arcade.key.LEFT:
-            self.player.change_x = 0
             self.player.change_x = 0
 
 
