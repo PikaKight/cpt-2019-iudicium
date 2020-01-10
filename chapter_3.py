@@ -17,6 +17,10 @@ class Ch3View(arcade.View):
         self.player = arcade.Sprite("ch4_Sprites/alienBlue_front.png", .4)
         self.player.center_x = 400
         self.player.center_y = 300
+        self.button_2 = arcade.Sprite(settings.button, .7)
+        self.button.center_x = 50
+        self.button.center_y = 75
+        
  
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -40,6 +44,7 @@ class Ch3View(arcade.View):
         arcade.draw_rectangle_outline(750,50, 100, 100, arcade.color.AERO_BLUE)
         arcade.draw_circle_filled(750, 550, 50, self.color_4) # min 690 max 700 x, min 100 max 90 y
         arcade.draw_rectangle_outline(750,550, 100, 100, arcade.color.AERO_BLUE) 
+        self.button.draw()
         self.player.draw()
         if self.x == 1:
             arcade.draw_rectangle_outline(400, 200, 700, 300, arcade.color.AERO_BLUE, 3)
