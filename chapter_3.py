@@ -33,9 +33,13 @@ class Ch3View(arcade.View):
         arcade.draw_rectangle_outline(575, 175, 50, 150, arcade.color.AZURE)
         arcade.draw_rectangle_filled(400, 590, 150, 20, arcade.color.ASH_GREY)
         arcade.draw_circle_filled(50, 50, 50, self.color_2) # min 100 110, min 100  max 90 y
+        arcade.draw_rectangle_outline(50,50, 100, 100, arcade.color.AERO_BLUE)
         arcade.draw_circle_filled(50, 550, 50, self.color_1) # min 100 max 110 x, min 500 y
+        arcade.draw_rectangle_outline(50,550, 100, 100, arcade.color.AERO_BLUE)
         arcade.draw_circle_filled(750, 50, 50, self.color_3) # min 690 max 700 x, min 500 y
-        arcade.draw_circle_filled(750, 550, 50, self.color_4) # min 690 max 700 x, min 100 max 90 y 
+        arcade.draw_rectangle_outline(750,50, 100, 100, arcade.color.AERO_BLUE)
+        arcade.draw_circle_filled(750, 550, 50, self.color_4) # min 690 max 700 x, min 100 max 90 y
+        arcade.draw_rectangle_outline(750,550, 100, 100, arcade.color.AERO_BLUE) 
         self.player.draw()
         if self.x == 1:
             arcade.draw_rectangle_outline(400, 200, 700, 300, arcade.color.AERO_BLUE, 3)
@@ -45,8 +49,20 @@ class Ch3View(arcade.View):
     
     def update(self, delta_time):
         self.player.update()
-    
+        
+        if self.player.center_x < 30:
+            self.player.change_x = 0
+        if self.player.center_x > 770:
+            self.player.change_x = 0
+        if self.player.center_y < 40:
+            self.player.change_y = 0
+        if self.player.center_y > 560:
+            self.player.change_y = 0
+
+
     def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.director.next_view()
 
         if key == arcade.key.W:
             self.player.change_y = speed
@@ -69,6 +85,9 @@ class Ch3View(arcade.View):
                 print("hi")
                 self.x = 1
 
+            if self.x == 1:
+                self.x = 0
+
             elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 500) and  self.puzzle_action == 0:
                 self.color_1 = arcade.color.GREEN
                 self.puzzle_action = 1
@@ -78,6 +97,7 @@ class Ch3View(arcade.View):
                 self.puzzle_action = 0
 
             elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 0:
+                print("hi")
                 self.color_2 = arcade.color.GREEN
                 self.puzzle_action = 1
 
@@ -87,14 +107,16 @@ class Ch3View(arcade.View):
             
             elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and  self.puzzle_action == 0:
                 self.color_3 = arcade.color.GREEN
+                print("hi")
                 self.puzzle_action = 1
 
             elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and  self.puzzle_action == 1:
                 self.color_3 = arcade.color.WHITE
                 self.puzzle_action = 0
 
-            elif (self.player.center_x  >= 690 and self.position_x.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 0:
+            elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 0:
                 self.color_4 = arcade.color.GREEN
+                print("hi")
                 self.puzzle_action = 1
 
             elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and  self.puzzle_action == 1:
