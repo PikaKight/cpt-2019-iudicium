@@ -4,7 +4,7 @@ import settings
 
 
 player_speedx = 5
-player_speedy = 5
+player_speedy = 5l
 
 
 class Chapter4View(arcade.View):
