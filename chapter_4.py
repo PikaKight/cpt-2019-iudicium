@@ -4,7 +4,7 @@ import settings
 
 
 player_speedx = 5
-player_speedy = 5
+player_speedy = 5l
 
 
 class Chapter4View(arcade.View):
@@ -18,6 +18,20 @@ class Chapter4View(arcade.View):
         self.player.center_x = 100
         self.player.center_y = 200
 
+        # Slime Sprite
+        self.slime_list = arcade.SpriteList()
+
+        for i in range(7):
+            slime_sprite = arcade.Sprite("ch4_Sprites/slimeGreen.png", 0.5)
+
+            slime_sprite.center_x = random.randrange(settings.WIDTH)
+            slime_sprite.center_y = random.randrange(settings.HEIGHT)
+
+            self.slime_list.append(slime_sprite)
+    
+    def setup(self):
+        pass
+
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
 
@@ -26,14 +40,24 @@ class Chapter4View(arcade.View):
         # arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2,
         #                  arcade.color.BLACK, font_size=30, anchor_x="center")
 
-        # Player Health Bar
-
+        # PLAYER
         self.player.draw()
 
-        if self.player.center_x >= settings.WIDTH - 10 or self.player.center_x <= 10:
-            self.player.change_x = 0
-        elif self.player.center_y >= settings.HEIGHT - 20 or self.player.center_y <= 20:
-            self.player.change_y = 0
+        # Player Health Bar
+        # arcade.draw_rectangle_outline()
+
+        # Player Boundaries (screen)
+        if self.player.center_x >= settings.WIDTH - 20:
+            self.player.center_x = settings.WIDTH - 20
+        elif self.player.center_x <= 20:
+            self.player.center_x = 20
+        elif self.player.center_y >= settings.HEIGHT - 20:
+            self.player.center_y = settings.HEIGHT - 19
+        elif self.player.center_y <= 10:
+            self.player.center_y = 20
+
+        # SLIME
+        self.slime_list.draw()
 
     def update(self, delta_time):
         self.player.update()
