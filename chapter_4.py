@@ -26,7 +26,14 @@ class Chapter4View(arcade.View):
         # arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2,
         #                  arcade.color.BLACK, font_size=30, anchor_x="center")
 
+        # Player Health Bar
+
         self.player.draw()
+
+        if self.player.center_x >= settings.WIDTH - 10 or self.player.center_x <= 10:
+            self.player.change_x = 0
+        elif self.player.center_y >= settings.HEIGHT - 20 or self.player.center_y <= 20:
+            self.player.change_y = 0
 
     def update(self, delta_time):
         self.player.update()
