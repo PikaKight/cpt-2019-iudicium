@@ -44,7 +44,7 @@ class Chapter4View(arcade.View):
         self.player.draw()
 
         # Player Health Bar
-        # arcade.draw_rectangle_outline()
+        arcade.draw_rectangle_outline()
 
         # Player Boundaries (screen)
         if self.player.center_x >= settings.WIDTH - 20:
