@@ -2,32 +2,78 @@ import arcade
 import random
 import settings
 
-
 player_speedx = 5
-player_speedy = 5l
+player_speedy = 5
+
+# Health Bar
+health_bar_width = 200
+
+# Slime attack power
+slime_strength = 5
 
 
-class Chapter4View(arcade.View):
+class Sprites:
+    def __init__(self, sprite_image, sprite_scaling):
+        self.sprite_image = sprite_image
+        self.sprite_scaling = sprite_scaling
+    
+
+class Player(Sprites):
+    def update(self):
+        # Movement
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        # Boundaries
+        if self.left < 0:
+            self.left = 0
+        elif self.right > settings.WIDTH:
+            self.right = settings.WIDTH
+        if self.top > settings.HEIGHT:
+            self.top = settings.HEIGHT
+        elif self.bottom < 0:
+            self.bottom = 0
+
+
+class Slime(Sprites):
+    def __init__(self, sprite_scaling):
+        super().__init__(sprite_scaling)
+        self.change_x = 0
+        self.change_y = 0
+
+    # def update(self):
+        # Movement
+
+        # Boundaries
+
+
+class Chapter4View(arcade.View):    
     def __init__(self):
         super().__init__()
 
-        # Player Sprite
-        player_sprite = "ch4_Sprites/alienBlue_front.png"
+        self.all_sprite_list = arcade.SpriteList()
 
-        self.player = arcade.Sprite(player_sprite, 0.3)
+        # PLAYER Sprite
+        self.player = arcade.Sprite("Sprites/alienBlue_front.png", 0.3)
         self.player.center_x = 100
         self.player.center_y = 200
 
-        # Slime Sprite
+        # Append player to player_list and all_sprites_list
+        self.all_sprite_list.append(self.player)
+
+        # SLIME Sprite
         self.slime_list = arcade.SpriteList()
 
         for i in range(7):
-            slime_sprite = arcade.Sprite("ch4_Sprites/slimeGreen.png", 0.5)
+            slime_sprite = arcade.Sprite("Sprites/slimeGreen.png", 0.5)
 
             slime_sprite.center_x = random.randrange(settings.WIDTH)
             slime_sprite.center_y = random.randrange(settings.HEIGHT)
+            slime_sprite.change_x = random.randrange(-4, 4)
+            slime_sprite.change_y = random.randrange(-4, 4)
 
             self.slime_list.append(slime_sprite)
+            self.all_sprite_list.append(slime_sprite)
     
     def setup(self):
         pass
@@ -37,32 +83,47 @@ class Chapter4View(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        # arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2,
-        #                  arcade.color.BLACK, font_size=30, anchor_x="center")
+
+        # Draw all sprites
+        self.all_sprite_list.draw()
 
         # PLAYER
-        self.player.draw()
-
         # Player Health Bar
-        arcade.draw_rectangle_outline()
+        arcade.draw_xywh_rectangle_filled(10, 570, 200, 20, arcade.color.BLACK)
+        arcade.draw_xywh_rectangle_filled(10, 570, health_bar_width, 20, arcade.color.GREEN)
 
-        # Player Boundaries (screen)
-        if self.player.center_x >= settings.WIDTH - 20:
-            self.player.center_x = settings.WIDTH - 20
-        elif self.player.center_x <= 20:
-            self.player.center_x = 20
-        elif self.player.center_y >= settings.HEIGHT - 20:
-            self.player.center_y = settings.HEIGHT - 19
-        elif self.player.center_y <= 10:
-            self.player.center_y = 20
-
-        # SLIME
-        self.slime_list.draw()
 
     def update(self, delta_time):
-        self.player.update()
+        global health_bar_width
+
+        self.all_sprite_list.update()
+
+        # Player Boundaries
+        if self.player.left < 0:
+            self.player.left = 0
+        elif self.player.right > settings.WIDTH:
+            self.player.right = settings.WIDTH
+        if self.player.top > settings.HEIGHT:
+            self.player.top = settings.HEIGHT
+        elif self.player.bottom < 0:
+            self.player.bottom = 0
+
+        # Slime Boundaries
+        for slime in self.slime_list:
+            if slime.left < 0 or slime.right > settings.WIDTH or arcade.check_for_collision_with_list(slime, self.slime_list):
+                slime.change_x *= -1
+            elif slime.bottom < 0 or slime.top > settings.HEIGHT or arcade.check_for_collision_with_list(slime, self.slime_list):
+                slime.change_y *= -1
+
+        collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
+
+        for collision in collisions:
+            health_bar_width -= slime_strength * 2
+
 
     def on_key_press(self, key, modifiers):
+        global health_bar_width
+
         if key == arcade.key.ESCAPE:
             self.director.next_view()
 
