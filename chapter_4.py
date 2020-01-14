@@ -6,22 +6,13 @@ player_speedx = 5
 player_speedy = 5
 
 # Health Bar
-health_bar_width = 200
+player_health = 100
 
 # Slime attack power
 slime_strength = 5
 
 
-class Sprites:
-    def __init__(self, sprite_image, sprite_scaling):
-        self.sprite_image = sprite_image
-        self.sprite_scaling = sprite_scaling
-    
-
-class Player(Sprites):
-    def setup(self):
-        pass
-
+class Player(arcade.Sprite):
     def update(self):
         # Movement
         self.center_x += self.change_x
@@ -38,26 +29,34 @@ class Player(Sprites):
             self.bottom = 0
 
 
-class Slime(Sprites):
-    def __init__(self, sprite_scaling):
-        super().__init__(sprite_scaling)
-        self.change_x = 0
-        self.change_y = 0
+class Slime(arcade.Sprite):
+    # def __init__(self, sprite_scaling):
+    #     super().__init__(sprite_scaling)
+    #     self.change_x = 0
+    #     self.change_y = 0
 
-    # def update(self):
+    def update(self):
         # Movement
+        self.center_x += self.change_x
+        self.center_y += self.change_y
 
         # Boundaries
+        if self.left < 0 or self.right > settings.WIDTH:
+            self.change_x *= -1
+        if self.bottom < 0 or self.top > settings.HEIGHT:
+            self.change_y *= -1
 
 
 class Chapter4View(arcade.View):    
     def __init__(self):
         super().__init__()
 
+        # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
+        self.slime_list = arcade.SpriteList()
 
         # PLAYER Sprite
-        self.player = arcade.Sprite("Sprites/alienBlue_front.png", 0.3)
+        self.player = Player("Sprites/alienBlue_front.png", 0.3)
         self.player.center_x = 100
         self.player.center_y = 200
 
@@ -65,26 +64,22 @@ class Chapter4View(arcade.View):
         self.all_sprite_list.append(self.player)
 
         # SLIME Sprite
-        self.slime_list = arcade.SpriteList()
-
         for i in range(7):
-            slime_sprite = arcade.Sprite("Sprites/slimeGreen.png", 0.5)
+            slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
 
             slime_sprite.center_x = random.randrange(settings.WIDTH)
             slime_sprite.center_y = random.randrange(settings.HEIGHT)
             slime_sprite.change_x = random.randrange(-4, 4)
             slime_sprite.change_y = random.randrange(-4, 4)
+            if slime_sprite.change_x  == 0 or slime_sprite.change_y == 0:
+                slime_sprite.change_x = 1
+                slime_sprite.change_y = -1
 
             self.slime_list.append(slime_sprite)
             self.all_sprite_list.append(slime_sprite)
     
     def setup(self):
         pass
-
-    def game_over(self):
-        arcade.set_background_color(arcade.color.BLACK)
-        arcade.draw_text("GAME OVER", settings.WIDTH/2, settings.HEIGHT/2, arcade.color.WHITE_SMOKE,
-                        font_size=30, bold=True)
 
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
@@ -98,39 +93,18 @@ class Chapter4View(arcade.View):
         # PLAYER
         # Player Health Bar
         arcade.draw_xywh_rectangle_filled(10, 570, 200, 20, arcade.color.BLACK)
-        arcade.draw_xywh_rectangle_filled(10, 570, health_bar_width, 20, arcade.color.GREEN)
+        arcade.draw_xywh_rectangle_filled(10, 570, player_health*2, 20, arcade.color.GREEN)
 
 
     def update(self, delta_time):
-        global health_bar_width
+        global player_health
 
         self.all_sprite_list.update()
-
-        # Player Boundaries
-        if self.player.left < 0:
-            self.player.left = 0
-        elif self.player.right > settings.WIDTH:
-            self.player.right = settings.WIDTH
-        if self.player.top > settings.HEIGHT:
-            self.player.top = settings.HEIGHT
-        elif self.player.bottom < 0:
-            self.player.bottom = 0
-
-        # Slime Boundaries
-        for slime in self.slime_list:
-            if slime.left < 0 or slime.right > settings.WIDTH or arcade.check_for_collision_with_list(slime, self.slime_list):
-                slime.change_x *= -1
-            elif slime.bottom < 0 or slime.top > settings.HEIGHT or arcade.check_for_collision_with_list(slime, self.slime_list):
-                slime.change_y *= -1
 
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
 
         for collision in collisions:
-            health_bar_width -= slime_strength * 2
-        
-        if health_bar_width >= 0:
-            game_over()
-
+            player_health -= slime_strength * 2
 
     def on_key_press(self, key, modifiers):
         global health_bar_width
