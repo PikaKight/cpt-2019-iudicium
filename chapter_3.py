@@ -58,8 +58,7 @@ class Ch3View(arcade.View):
         self.button_4.draw()
         self.player.draw()
         if self.x == 1:
-            arcade.draw_rectangle_outline(400, 200, 700, 300, arcade.color.AERO_BLUE, 3)
-            arcade.draw_rectangle_filled(400,200,697,297,arcade.color.BLACK)
+            self.text_box.draw()
             arcade.draw_text("Hello", 400, 300, arcade.color.WHITE, 40, 0, align="left", font_name="Comic Sans")
         
     
