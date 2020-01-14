@@ -2,6 +2,9 @@ import arcade
 import random
 import settings
 
+
+screen = "chapter4"
+
 player_speedx = 5
 player_speedy = 5
 
@@ -30,11 +33,6 @@ class Player(arcade.Sprite):
 
 
 class Slime(arcade.Sprite):
-    # def __init__(self, sprite_scaling):
-    #     super().__init__(sprite_scaling)
-    #     self.change_x = 0
-    #     self.change_y = 0
-
     def update(self):
         # Movement
         self.center_x += self.change_x
@@ -47,7 +45,28 @@ class Slime(arcade.Sprite):
             self.change_y *= -1
 
 
-class Chapter4View(arcade.View):    
+class ch4_Menu(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Chapter 4", settings.WIDTH/2 - 50, settings.HEIGHT/2 + 50, arcade.color.BLACK,
+                        font_size=30, bold=True, )
+        arcade.draw_text("Press ENTER to proceed to Game", settings.WIDTH/2 - 150, settings.HEIGHT/2,
+                        arcade.color.BLACK, font_size=25)
+        arcade.draw_text("Press ESC to Exit Game", settings.WIDTH/2 - 100, settings.HEIGHT/2 - 50,
+                        arcade.color.BLACK, font_size=25)
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+
+class gameView(arcade.View):
     def __init__(self):
         super().__init__()
 
@@ -60,7 +79,6 @@ class Chapter4View(arcade.View):
         self.player.center_x = 100
         self.player.center_y = 200
 
-        # Append player to player_list and all_sprites_list
         self.all_sprite_list.append(self.player)
 
         # SLIME Sprite
@@ -77,34 +95,33 @@ class Chapter4View(arcade.View):
 
             self.slime_list.append(slime_sprite)
             self.all_sprite_list.append(slime_sprite)
-    
-    def setup(self):
-        pass
 
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
-
+    
     def on_draw(self):
         arcade.start_render()
 
-        # Draw all sprites
         self.all_sprite_list.draw()
 
-        # PLAYER
         # Player Health Bar
         arcade.draw_xywh_rectangle_filled(10, 570, 200, 20, arcade.color.BLACK)
         arcade.draw_xywh_rectangle_filled(10, 570, player_health*2, 20, arcade.color.GREEN)
-
-
+    
     def update(self, delta_time):
         global player_health
 
         self.all_sprite_list.update()
 
+        # Player and Slime Collision
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
 
         for collision in collisions:
             player_health -= slime_strength * 2
+        
+        if player_health <= 0:
+            gameOverView = gameOverView()
+            self.window.show_view(gameOverView)
 
     def on_key_press(self, key, modifiers):
         global health_bar_width
@@ -121,15 +138,31 @@ class Chapter4View(arcade.View):
         elif key == arcade.key.LEFT:
             self.player.change_x = -player_speedx            
 
-
     def on_key_release(self, key, modifiers):
-        # self.director.next_view()
-
         if key == arcade.key.UP or key == arcade.key.DOWN:
             self.player.change_y = 0
         elif key == arcade.key.RIGHT or key == arcade.key.LEFT:
             self.player.change_x = 0
 
+
+class gameOverView(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.BLACK_OLIVE)
+    
+    def on_draw(self):
+        arcade.draw_text("""GAME OVER
+  YOU DIED""", settings.WIDTH/2 - 100, settings.HEIGHT/2 + 50, arcade.color.WHITE, font_size=30, bold=True)
+        arcade.draw_text("Press Enter to Restart", settings.WIDTH/2 - 150, settings.HEIGHT/2,
+                        arcade.color.WHITE, font_size=25)
+        arcade.draw_text("Press ESC to Exit Game", settings.WIDTH/2 - 150, settings.HEIGHT/2 - 50,
+                        arcade.color.WHITE, font_size=25)
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
 
 
 if __name__ == "__main__":
@@ -144,7 +177,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = Chapter4View()
+    my_view = gameOverView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
