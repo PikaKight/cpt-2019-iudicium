@@ -1,0 +1,329 @@
+import arcade
+import random
+import math
+import settings
+
+
+screen = "chapter4"
+
+# Player
+player_speedx = 5
+player_speedy = 5
+player_strength = 25
+laser_speed = 8
+
+# Health Bar
+player_health = 100
+health_barx = 10
+health_bary = 570
+health_bar_height = 20
+health_bar_width = 200
+
+# Slime
+slime_health = 100
+slime_strength = 5
+
+
+class Player(arcade.Sprite):
+    def update(self):
+        # Movement
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        # Boundaries
+        if self.left < 0:
+            self.left = 0
+        elif self.right > settings.WIDTH:
+            self.right = settings.WIDTH
+        if self.top > settings.HEIGHT:
+            self.top = settings.HEIGHT
+        elif self.bottom < 0:
+            self.bottom = 0
+
+
+class Slime(arcade.Sprite):
+    def update(self):
+        # Movement
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        # Boundaries
+        if self.left < 0 or self.right > settings.WIDTH:
+            self.change_x *= -1
+        if self.bottom < 0 or self.top > settings.HEIGHT:
+            self.change_y *= -1
+
+
+class ch4_Menu(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
+
+    def on_show(self):
+        pass
+    
+    def on_draw(self):
+        arcade.start_render()
+
+        arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
+                                    settings.WIDTH, settings.HEIGHT, self.background)
+
+        arcade.draw_text("Chapter 4", settings.WIDTH/2, settings.HEIGHT/2 + 50, arcade.color.WHITE,
+                        font_size=45, bold=True, anchor_x="center")
+        arcade.draw_text("Press ENTER to proceed to Game", settings.WIDTH/2, settings.HEIGHT/2,
+                        arcade.color.WHITE, font_size=20, anchor_x="center")
+        arcade.draw_text("Press ESC to Exit Game", settings.WIDTH/2, settings.HEIGHT/2 - 50,
+                        arcade.color.WHITE, font_size=20, anchor_x="center")
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+
+class Make_Word(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+        # Sprite Lists
+        self.all_sprite_list = arcade.SpriteList()
+        self.letters_list = arcade.SpriteList()
+
+        # Letters
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        random_order = random.sample(alphabet, 26)
+        letter_x = 50
+        letter_x1 = letter_x
+        letter_x2 = letter_x
+        letter_x3 = letter_x
+        letter_x4 = letter_x
+        letter_y = 450
+        for i, letter in enumerate(random_order):
+            if i <= 5:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x
+                self.letter.center_y = letter_y
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x += 60
+            elif i > 5 and i <= 11:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x1
+                self.letter.center_y = letter_y - 60
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x1 += 60
+            elif i > 11 and i <= 17:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x2
+                self.letter.center_y = letter_y - 120
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x2 += 60
+            elif i > 17 and i <= 23:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x3
+                self.letter.center_y = letter_y - 180
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x3 += 60
+            else:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x4
+                self.letter.center_y = letter_y - 240
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x4 += 60
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.FLORAL_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+        self.all_sprite_list.draw()
+    
+    def on_update(self, delta_time):
+        pass
+
+    def on_mouse_press(self):
+        pass
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.director.next_view()       
+
+
+class gameView(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+        # Sprite Lists
+        self.all_sprite_list = arcade.SpriteList()
+        self.slime_list = arcade.SpriteList()
+        self.laser_list = arcade.SpriteList()
+
+        # PLAYER Sprite
+        self.player = Player("Sprites/alienBlue_front.png", 0.3)
+        self.player.center_x = settings.WIDTH/2
+        self.player.center_y = settings.HEIGHT/2
+
+        self.all_sprite_list.append(self.player)
+
+        # SLIME Sprite
+        for i in range(8):
+            slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
+
+            slime_sprite.center_x = random.randrange(settings.WIDTH)
+            slime_sprite.center_y = random.randrange(settings.HEIGHT)
+            slime_sprite.change_x = random.randrange(-4, 4)
+            slime_sprite.change_y = random.randrange(-4, 4)
+            if slime_sprite.change_x  == 0 or slime_sprite.change_y == 0:
+                slime_sprite.change_x = 1
+                slime_sprite.change_y = -1
+
+            self.slime_list.append(slime_sprite)
+            self.all_sprite_list.append(slime_sprite)
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.GHOST_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+
+        self.all_sprite_list.draw()
+
+        # Player Health Bar
+        arcade.draw_xywh_rectangle_filled(health_barx, health_bary, health_bar_width,
+                                            health_bar_height, arcade.color.BLACK)
+        arcade.draw_xywh_rectangle_filled(health_barx, health_bary, player_health*2,
+                                            health_bar_height, arcade.color.GUPPIE_GREEN)
+        arcade.draw_text(f"{player_health}/100", health_barx, health_bary - 25,
+                        arcade.color.BLACK, font_size=15)
+    
+    def on_update(self, delta_time):
+        global player_health, slime_health
+
+        self.all_sprite_list.update()
+
+        # Player and Slime Collision
+        collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
+
+        for collision in collisions:
+            player_health -= slime_strength * 2
+        
+        # Player Attacks Slime
+        for slime in self.slime_list:
+            times_hit = 0
+            for laser in self.laser_list:
+                if arcade.check_for_collision_with_list(laser, self.slime_list):
+                    times_hit += 1
+                    laser.remove_from_sprite_lists()
+
+            # Laser flies off screen
+                if laser.left > settings.WIDTH or laser.right < 0 or laser.bottom > settings.HEIGHT or laser.top < 0:
+                    laser.remove_from_sprite_lists()
+
+            if times_hit == 4:
+                slime.remove_from_sprite_lists()
+
+        # Slime HP reaches 0
+        # for slime in self.slime_list:
+        #     if slime_health <= 0:
+        #         slime.remove_from_sprite_lists()
+
+        # Player HP reaches 0
+        if player_health <= 0:
+            gameOverView = gameOverView()
+            self.window.show_view(gameOverView)
+    
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.laser = arcade.Sprite("Sprites/laserBlue.png", 0.8)
+
+        # Position laser at player location
+        self.laser.center_x = self.player.center_x
+        self.laser.center_y = self.player.center_y
+
+        # Target Co-ordinates
+        self.target_x = x
+        self.target_y = y
+
+        # Calculate angle of laser
+        x_diff = self.target_x - self.player.center_x
+        y_diff = self.target_y - self.player.center_y
+        angle = math.atan2(y_diff, x_diff)
+
+        # Angle the laser sprite
+        self.laser.angle = math.degrees(angle)
+
+        # Laser Speed
+        self.laser.change_x = math.cos(angle) * laser_speed
+        self.laser.change_y = math.sin(angle) * laser_speed
+
+        # Add laser to list
+        self.laser_list.append(self.laser)
+        self.all_sprite_list.append(self.laser)
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.W:
+            self.player.change_y = player_speedy
+        elif key == arcade.key.S:
+            self.player.change_y = -player_speedy
+        elif key == arcade.key.D:
+            self.player.change_x = player_speedx
+        elif key == arcade.key.A:
+            self.player.change_x = -player_speedx
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()       
+
+    def on_key_release(self, key, modifiers):
+        if key == arcade.key.W or key == arcade.key.S:
+            self.player.change_y = 0
+        elif key == arcade.key.D or key == arcade.key.A:
+            self.player.change_x = 0
+
+
+class gameOverView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.background = arcade.load_texture("Sprites/gameOver_screen.jpg")
+
+    def on_show(self):
+        pass
+    
+    def on_draw(self):
+        arcade.start_render()
+
+        arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
+                                        settings.WIDTH, settings.HEIGHT, self.background)
+
+        arcade.draw_text("Press Enter to Restart", settings.WIDTH/2, settings.HEIGHT/2 - 150,
+                        arcade.color.WHITE, font_size=20, anchor_x="center")
+        arcade.draw_text("Press ESC to Exit Game", settings.WIDTH/2, settings.HEIGHT/2 - 200,
+                        arcade.color.WHITE, font_size=20, anchor_x="center")
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+
+if __name__ == "__main__":
+    """This section of code will allow you to run your View
+    independently from the main.py file and its Director.
+
+    You can ignore this whole section. Keep it at the bottom
+    of your code.
+
+    It is advised you do not modify it unless you really know
+    what you are doing.
+    """
+    from utils import FakeDirector
+    window = arcade.Window(settings.WIDTH, settings.HEIGHT)
+    my_view = Make_Word()
+    my_view.director = FakeDirector(close_on_next_view=True)
+    window.show_view(my_view)
+    arcade.run()
