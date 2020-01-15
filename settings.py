@@ -6,5 +6,5 @@ player_sprite = "Sprites/alienBlue_front.png"
 
 slime_sprite = "Sprites/slimeGreen.png"
 
-button = "Sprites\switchGreen_pressed.png"
+button = "Sprites\switchGreen.png"
 button_pressed = "Sprites\switchGreen_pressed.png"

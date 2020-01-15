@@ -2,44 +2,107 @@ import arcade
 
 import settings
 speed = 6
-        
+
+class ShowButton(arcade.gui.TextButton):
+    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Show", theme=None):
+        super().__init__(x, y, width, height, text, theme=theme)
+        self.dialoguebox = dialoguebox
+
+    def on_press(self):
+        if not self.dialoguebox.active:
+            self.pressed = True
+
+    def on_release(self):
+        if self.pressed:
+            self.pressed = False
+            self.dialoguebox.active = True
+
+
+class CloseButton(arcade.gui.TextButton):
+    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close", theme=None):
+        super().__init__(x, y, width, height, text, theme=theme)
+        self.dialoguebox = dialoguebox
+
+    def on_press(self):
+        if self.dialoguebox.active:
+            self.pressed = True
+
+    def on_release(self):
+        if self.pressed and self.dialoguebox.active:
+            self.pressed = False
+            self.dialoguebox.active = False
+
 class Player(arcade.Sprite):
+    def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
+        super().__init__(filename=filename, scale=scale, image_x=image_x, image_y=image_y, image_width=image_width, image_height=image_height, center_x=center_x, center_y=center_y, repeat_count_x=repeat_count_x, repeat_count_y=repeat_count_y)
+
     def update(self):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        if self.center_x < 30:
-            self.change_x = 0
-        if self.center_x > 770:
-            self.change_x = 0
-        if self.center_y < 40:
-            self.change_y = 0
-        if self.center_y > 560:
-            self.change_y = 0
+        if self.left < 0:
+            self.left = 0
+        if self.right > settings.WIDTH:
+            self.right = settings.WIDTH
+
+        if self.bottom < 0:
+            self.bottom = 3
+        if self.top > settings.HEIGHT:
+            self.top = settings.HEIGHT
+        
+        #boundary for inner left of the wall
+        if self.left < 230 and self.right > 173: 
+            if self.bottom <= 448 and self.top >= 346:
+                self.left = 230
+            if self.bottom <= 256 and self.top >= 155:
+                self.left = 230
+        
+        #boundray for inner bottom of the wall
+        if self.bottom < 155:
+            if self.right >= 230 and self.right <= 330:
+                self.bottom = 155
+            if self.left >= 445 and self.left <= 545:
+                self.bottom = 155
+
+        #boundray for inner right of the wall
+        if self.right > 545:
+            if self.bottom <= 256 and self.top >= 155:
+                self.right = 545 
+            if self.bottom <= 448 and self.top >= 346:
+                self.right = 545
+        
+        #boundray for inner top of the wall
+        if self.top > 448:
+            if self.left >= 230 and self.left <= 330:
+                self.top = 448
+            if self.right >= 445 and self.right <= 545:
+                self.top = 448
+
+        
+        
+        
         
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
-        self.button = settings.button
         self.x = 0
-        self.puzzle_action = 0
-        self.color_1 = arcade.color.WHITE
-        self.color_2 = arcade.color.WHITE
-        self.color_3 = arcade.color.WHITE
-        self.color_4 = arcade.color.WHITE
-        # self.music = arcade.Sound("End_of_Time.mp3")
-        # self.music.play()
+        self.half_width = settings.WIDTH * .5
+        self.half_height = settings.HEIGHT * .5
+        self.button = settings.button
         self.player = Player("Sprites/alienBlue_front.png", .4, 0, 0, 0, 0, 400, 300)
         self.text_sprite = arcade.Sprite("Sprites\Brown.png", .5, 0 ,0, 0, 0, 400, 590)
-        self.text_box = arcade.Sprite("Sprites\DialogueBox.png", 1, 0,0,0,0, )
+        self.text_box = arcade.Sprite("Sprites\DialogueBox.png", 1, 0,0,0,0, 400, 300)
         self.button_1 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 570)
         self.button_2 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 75)
         self.button_3 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 570)
         self.button_4 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 75)
 
- 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
+        self.set_theme()
+        self.add_dialogue_box()
+        self.add_text()
+        self.add_button()
 
     def on_draw(self):
         arcade.start_render()
@@ -58,10 +121,43 @@ class Ch3View(arcade.View):
         self.button_4.draw()
         self.player.draw()
         if self.x == 1:
-            self.text_box.draw()
-            arcade.draw_text("Hello", 400, 300, arcade.color.WHITE, 40, 0, align="left", font_name="Comic Sans")
-        
+            super().on_draw()
+
+    def add_dialogue_box(self):
+        color = (220, 228, 255)
+        dialoguebox = arcade.gui.DialogueBox(self.half_width, self.half_height, self.half_width*1.1, self.half_height*1.1, None, self.theme)
+        close_button = CloseButton(dialoguebox, self.half_width, self.half_height-(self.half_height/2) + 40,
+                                   theme=self.theme)
+        dialoguebox.button_list.append(close_button)
+        message = "Hello I am a Dialogue Box."
+        dialoguebox.text_list.append(arcade.gui.Text(message, self.half_width, self.half_height, self.theme.font_color))
+        self.dialogue_box_list.append(dialoguebox)
+
+    def add_text(self):
+        message = "Press this button to activate the Dialogue Box"
+        self.text_list.append(arcade.gui.Text(message, self.half_width-50, self.half_height))
+
+    def add_button(self):
+        show_button = ShowButton(self.dialogue_box_list[0], settings.WIDTH-100, self.half_height, theme=self.theme)
+        self.button_list.append(show_button)
+
+    def set_dialogue_box_texture(self):
+        dialogue_box = ":resources:gui_themes/Fantasy/DialogueBox/DialogueBox.png"
+        self.theme.add_dialogue_box_texture(dialogue_box)
     
+    def set_button_texture(self):
+        normal = ":resources:gui_themes/Fantasy/Buttons/Normal.png"
+        hover = ":resources:gui_themes/Fantasy/Buttons/Hover.png"
+        clicked = ":resources:gui_themes/Fantasy/Buttons/Clicked.png"
+        locked = ":resources:gui_themes/Fantasy/Buttons/Locked.png"
+        self.theme.add_button_textures(normal, hover, clicked, locked)
+
+    def set_theme(self):
+        self.theme = arcade.gui.Theme()
+        self.set_dialogue_box_texture()
+        self.set_button_texture()
+        self.theme.set_font(24, arcade.color.WHITE)
+
     def update(self, delta_time):
         self.player.update()
 
@@ -86,9 +182,8 @@ class Ch3View(arcade.View):
             self.player.change_x = speed
         
         elif key == arcade.key.SPACE:
-            print(self.player.center_x, self.player.center_y)
             
-            if (self.player.center_x  >= 340 and self.player.center_x <= 460) and (self.player.center_y >= 555):
+            if (self.player.center_x  >= 290 and self.player.center_x <= 515) and (self.player.center_y >= 555):
                 self.x = 1
 
             elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 0:
@@ -96,35 +191,32 @@ class Ch3View(arcade.View):
                 self.puzzle_action = 1
 
             elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 540 and self.player.center_y <= 564 ) and self.puzzle_action == 1:
-                self.button = settings.button_pressed
+                self.button = settings.button
                 self.puzzle_action = 0
 
-            # elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 100 and self.player.center_y <= 90) and self.puzzle_action == 0:
-            #     print("hi")
-            #     self.color_2 = arcade.color.GREEN
-            #     self.puzzle_action = 1
+            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 0:
+                self.button = settings.button_pressed
+                self.puzzle_action = 1
 
-            # elif (self.player.center_x  >= 0 and self.player.center_x <= 110) and (self.player.center_y >= 100 and self.player.center_y <= 90) and self.puzzle_action == 1:
-            #     self.color_2 = arcade.color.WHITE
-            #     self.puzzle_action = 0
+            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 1:
+                self.button = settings.button
+                self.puzzle_action = 0
             
-            # elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and self.puzzle_action == 0:
-            #     self.color_3 = arcade.color.GREEN
-            #     print("hi")
-            #     self.puzzle_action = 1
+            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 0:
+                self.button = settings.button_pressed
+                self.puzzle_action = 1
 
-            # elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 500) and self.puzzle_action == 1:
-            #     self.color_3 = arcade.color.WHITE
-            #     self.puzzle_action = 0
+            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 1:
+                self.button = settings.button
+                self.puzzle_action = 0
 
-            # elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and self.puzzle_action == 0:
-            #     self.color_4 = arcade.color.GREEN
-            #     print("hi")
-            #     self.puzzle_action = 1
+            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 0:
+                self.button = settings.button_pressed
+                self.puzzle_action = 1
 
-            # elif (self.player.center_x  >= 690 and self.player.center_x <= 700) and (self.player.center_y >= 100 and self.player.center_y <= 90) and self.puzzle_action == 1:
-            #     self.color_4 = arcade.color.WHITE
-            #     self.puzzle_action = 0
+            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 1:
+                self.button = settings.button
+                self.puzzle_action = 0
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
