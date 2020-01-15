@@ -4,8 +4,6 @@ import math
 import settings
 
 
-screen = "chapter4"
-
 # Player
 player_speedx = 5
 player_speedy = 5
@@ -21,7 +19,7 @@ health_bar_width = 200
 
 # Slime
 slime_health = 100
-slime_strength = 5
+slime_strength = 2
 
 
 class Player(arcade.Sprite):
@@ -54,7 +52,7 @@ class Slime(arcade.Sprite):
             self.change_y *= -1
 
 
-class ch4_Menu(arcade.View):
+class ch4_MenuView(arcade.View):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
@@ -83,13 +81,20 @@ class ch4_Menu(arcade.View):
             self.director.next_view()
 
 
-class Make_Word(arcade.View):
+class Make_WordView(arcade.View):
     def __init__(self):
         super().__init__()
 
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
         self.letters_list = arcade.SpriteList()
+
+        # Sort Box
+        self.sort_box = arcade.Sprite("Sprites/Brown.png", 0.2)
+        self.sort_box.center_x = 80
+        self.sort_box.center_y = 510
+
+        self.all_sprite_list.append(self.sort_box)
 
         # Letters
         alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -100,6 +105,8 @@ class Make_Word(arcade.View):
         letter_x3 = letter_x
         letter_x4 = letter_x
         letter_y = 450
+
+        # Organize letters 6 by 4 in random order
         for i, letter in enumerate(random_order):
             if i <= 5:
                 self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
@@ -143,11 +150,19 @@ class Make_Word(arcade.View):
     def on_draw(self):
         arcade.start_render()
         self.all_sprite_list.draw()
+
+        # Sort
+        arcade.draw_text("Sort", self.sort_box.center_x, self.sort_box.center_y,
+                        arcade.color.AQUAMARINE, font_size=18, anchor_x="center", anchor_y="center")
     
     def on_update(self, delta_time):
         pass
 
-    def on_mouse_press(self):
+    def on_mouse_press(self, x, y, button, modifiers):
+        # Click on Sort button, sort alphabet
+        
+        # if arcade.collides_with_point([x, y], self.all_sprite_list):
+        #     print("HIT")
         pass
 
     def on_key_press(self, key, modifiers):
@@ -323,7 +338,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = Make_Word()
+    my_view = gameView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
