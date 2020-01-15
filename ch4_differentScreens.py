@@ -93,13 +93,14 @@ class Make_Word(arcade.View):
 
         # Letters
         alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        random_order = random.sample(alphabet, 26)
         letter_x = 50
         letter_x1 = letter_x
         letter_x2 = letter_x
         letter_x3 = letter_x
         letter_x4 = letter_x
         letter_y = 450
-        for i, letter in enumerate(alphabet):
+        for i, letter in enumerate(random_order):
             if i <= 5:
                 self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
                 self.letter.center_x = letter_x
@@ -152,7 +153,6 @@ class Make_Word(arcade.View):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             self.director.next_view()       
-
 
 
 class gameView(arcade.View):
