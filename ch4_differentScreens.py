@@ -1,5 +1,6 @@
 import arcade
 import random
+import math
 import settings
 
 
@@ -10,8 +11,11 @@ player_speedy = 5
 
 # Health Bar
 player_health = 100
+player_attack = 25
+laser_speed = 5
 
-# Slime attack power
+# Slime
+slime_health = 100
 slime_strength = 5
 
 
@@ -73,6 +77,7 @@ class gameView(arcade.View):
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
         self.slime_list = arcade.SpriteList()
+        self.laser_list = arcade.SpriteList()
 
         # PLAYER Sprite
         self.player = Player("Sprites/alienBlue_front.png", 0.3)
@@ -81,8 +86,11 @@ class gameView(arcade.View):
 
         self.all_sprite_list.append(self.player)
 
+        # Player Attack
+        # self.player_attack = 
+
         # SLIME Sprite
-        for i in range(7):
+        for i in range(8):
             slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
 
             slime_sprite.center_x = random.randrange(settings.WIDTH)
@@ -108,7 +116,7 @@ class gameView(arcade.View):
         arcade.draw_xywh_rectangle_filled(10, 570, 200, 20, arcade.color.BLACK)
         arcade.draw_xywh_rectangle_filled(10, 570, player_health*2, 20, arcade.color.GREEN)
     
-    def update(self, delta_time):
+    def on_update(self, delta_time):
         global player_health
 
         self.all_sprite_list.update()
@@ -119,15 +127,49 @@ class gameView(arcade.View):
         for collision in collisions:
             player_health -= slime_strength * 2
         
+        # Player Attacks Slime
+        for laser in self.laser_list:
+            if arcade.check_for_collision_with_list(laser, self.slime_list):
+                laser.remove_from_sprite_lists()
+
+            # Laser flies off screen
+            if laser.right > settings.WIDTH or laser.left < 0 or laser.top > settings.HEIGHT or laser.bottom < 0:
+                laser.remove_from_sprite_lists()
+        
+        # Player Health reaches 0
         if player_health <= 0:
             gameOverView = gameOverView()
             self.window.show_view(gameOverView)
+    
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.laser = arcade.Sprite("Sprites/laserBlue.png", 0.5)
+
+        # Position laser at player location
+        self.laser.center_x = self.player.center_x
+        self.laser.center_y = self.player.center_y
+
+        # Target Co-ordinates
+        self.target_x = x
+        self.target_y = y
+
+        # Calculate angle of laser
+        x_diff = self.target_x - self.player.center_x
+        y_diff = self.target_y - self.player.center_y
+        angle = math.atan2(y_diff, x_diff)
+
+        # Angle the laser sprite
+        self.laser.angle = math.degrees(angle)
+
+        # Laser Speed
+        self.laser.change_x = math.cos(angle) * laser_speed
+        self.laser.change_y = math.sin(angle) * laser_speed
+
+        # Add laser to list
+        self.laser_list.append(self.laser)
+        self.all_sprite_list.append(self.laser)
 
     def on_key_press(self, key, modifiers):
         global health_bar_width
-
-        if key == arcade.key.ESCAPE:
-            self.director.next_view()
 
         if key == arcade.key.UP:
             self.player.change_y = player_speedy
@@ -136,7 +178,9 @@ class gameView(arcade.View):
         elif key == arcade.key.RIGHT:
             self.player.change_x = player_speedx
         elif key == arcade.key.LEFT:
-            self.player.change_x = -player_speedx            
+            self.player.change_x = -player_speedx
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()       
 
     def on_key_release(self, key, modifiers):
         if key == arcade.key.UP or key == arcade.key.DOWN:
@@ -177,7 +221,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = gameOverView()
+    my_view = ch4_Menu()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
