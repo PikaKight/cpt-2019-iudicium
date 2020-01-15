@@ -60,7 +60,6 @@ class ch4_Menu(arcade.View):
         self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
 
     def on_show(self):
-        # arcade.set_background_color(arcade.color.WHITE)
         pass
     
     def on_draw(self):
@@ -82,6 +81,78 @@ class ch4_Menu(arcade.View):
             self.window.show_view(game_View)
         elif key == arcade.key.ESCAPE:
             self.director.next_view()
+
+
+class Make_Word(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+        # Sprite Lists
+        self.all_sprite_list = arcade.SpriteList()
+        self.letters_list = arcade.SpriteList()
+
+        # Letters
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        letter_x = 50
+        letter_x1 = letter_x
+        letter_x2 = letter_x
+        letter_x3 = letter_x
+        letter_x4 = letter_x
+        letter_y = 450
+        for i, letter in enumerate(alphabet):
+            if i <= 5:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x
+                self.letter.center_y = letter_y
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x += 60
+            elif i > 5 and i <= 11:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x1
+                self.letter.center_y = letter_y - 60
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x1 += 60
+            elif i > 11 and i <= 17:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x2
+                self.letter.center_y = letter_y - 120
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x2 += 60
+            elif i > 17 and i <= 23:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x3
+                self.letter.center_y = letter_y - 180
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x3 += 60
+            else:
+                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
+                self.letter.center_x = letter_x4
+                self.letter.center_y = letter_y - 240
+                self.letters_list.append(self.letter)
+                self.all_sprite_list.append(self.letter)
+                letter_x4 += 60
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.FLORAL_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+        self.all_sprite_list.draw()
+    
+    def on_update(self, delta_time):
+        pass
+
+    def on_mouse_press(self):
+        pass
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.director.next_view()       
+
 
 
 class gameView(arcade.View):
@@ -252,7 +323,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = ch4_Menu()
+    my_view = Make_Word()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
