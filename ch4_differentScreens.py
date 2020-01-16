@@ -11,7 +11,7 @@ player_strength = 25
 laser_speed = 8
 
 # Health Bar
-player_health = 100
+# player_health = 100
 health_barx = 10
 health_bary = 570
 health_bar_height = 20
@@ -22,7 +22,7 @@ slime_health = 100
 slime_strength = 10
 
 # Fish
-recovery_points = 25
+recovery_points = 15
 
 
 class Player(arcade.Sprite):
@@ -60,10 +60,10 @@ class Fish(Slime):
 
 
 def fish(self):
-    global player_health
+    # global player_health
 
     if len(self.fish_list) == 0:
-        if player_health <= 50 and self.frame_count % 200 == 0:
+        if self.player_health <= 50 and self.frame_count % 200 == 0:
             self.fish = Fish("Sprites/fishPink.png", 0.3)
             self.fish.center_x = random.randrange(20, settings.WIDTH - 20)
             self.fish.center_y = random.randrange(20, settings.HEIGHT - 20)
@@ -74,7 +74,7 @@ def fish(self):
             self.all_sprite_list.append(self.fish)
 
     if len(self.fish_list) <= 1 and arcade.check_for_collision_with_list(self.player, self.fish_list):
-        player_health += recovery_points
+        self.player_health += recovery_points
         self.fish.remove_from_sprite_lists()
         fish(self)
 
@@ -112,18 +112,24 @@ class Username(arcade.View):
     def __init__(self):
         super().__init__()
 
-        # Sprite Lists
-        # self.dialogue_box_list = arcade.SpriteList()
-
         self.dialogue_box = arcade.Sprite("Sprites/DialogueBox.png", 1)
         self.dialogue_box.center_x = settings.WIDTH/2
         self.dialogue_box.center_y = settings.HEIGHT/2
-        # self.dialogue_box_list.append(self.dialogue_box)
-    
+
+        self.text = ""
+        self.center_x = self.dialogue_box.center_x
+        self.center_y = self.dialogue_box.center_y
+
+    def setup(self):
+        self.textbox_list.append(arcade.gui.TextBox(self.center_x - 125, self.center_y))
+        self.button_list.append(arcade.gui.SubmitButton(self.textbox_list[0], self.on_submit, self.center_x,
+                                                        self.center_y))
+
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
 
     def on_draw(self):
+        super().on_draw()
         arcade.start_render()
 
         self.dialogue_box.draw()
@@ -134,8 +140,18 @@ class Username(arcade.View):
                         self.dialogue_box.center_x, self.dialogue_box.center_y + 90, arcade.color.BLACK,
                         font_size=15, anchor_x="center",anchor_y="center")
 
+        if self.text:
+            arcade.draw_text(f"{self.text}", self.dialogue_box.center_x, self.dialogue_box.center_y,
+                            arcade.color.BLACK, 24)
+
+    def on_submit(self):
+        self.text = self.textbox_list[0].text_storage.text
+
     def update(self, delta_time):
         self.dialogue_box.update()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        pass
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
@@ -148,6 +164,9 @@ class Username(arcade.View):
 class gameView(arcade.View):
     def __init__(self):
         super().__init__()
+        
+        # Background
+        self.background = arcade.load_texture("Sprites/tiledFloor.jpg")
 
         # Frame Count
         self.frame_count = 0
@@ -171,6 +190,7 @@ class gameView(arcade.View):
         self.player = Player("Sprites/alienBlue_front.png", 0.3)
         self.player.center_x = settings.WIDTH/2
         self.player.center_y = settings.HEIGHT/2
+        self.player_health = 100
 
         self.all_sprite_list.append(self.player)
 
@@ -196,6 +216,10 @@ class gameView(arcade.View):
     def on_draw(self):
         arcade.start_render()
 
+        # Draw Background
+        arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
+                                    settings.WIDTH, settings.HEIGHT, self.background)
+
         self.all_sprite_list.draw()
 
         # Calculate time
@@ -211,16 +235,16 @@ class gameView(arcade.View):
         # Player Health Bar
         arcade.draw_xywh_rectangle_filled(health_barx, health_bary, health_bar_width,
                                             health_bar_height, arcade.color.BLACK)
-        arcade.draw_xywh_rectangle_filled(health_barx, health_bary, player_health*2,
+        arcade.draw_xywh_rectangle_filled(health_barx, health_bary, self.player_health*2,
                                             health_bar_height, arcade.color.GUPPIE_GREEN)
-        arcade.draw_text(f"{player_health}/100", health_barx, health_bary - 25,
+        arcade.draw_text(f"{self.player_health}/100", health_barx, health_bary - 25,
                         arcade.color.BLACK, font_size=15)
 
         # Fish
         fish(self)
 
     def on_update(self, delta_time):
-        global player_health, slime_health
+        global slime_health #player_health
 
         self.all_sprite_list.update()
 
@@ -234,7 +258,7 @@ class gameView(arcade.View):
         for collision in collisions:
             if self.frame_count % 10 == 0:
                 self.total_damage += slime_strength
-                player_health -= slime_strength
+                self.player_health -= slime_strength
         
         # Player Attacks Slime
         for slime in self.slime_list:
@@ -252,7 +276,7 @@ class gameView(arcade.View):
                 slime.remove_from_sprite_lists()
 
         # Player HP reaches 0
-        if player_health <= 0:
+        if self.player_health <= 0:
             gameOver_View = gameOverView()
             self.window.show_view(gameOver_View)
     
@@ -325,8 +349,43 @@ class gameOverView(arcade.View):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
             menu_View = ch4_MenuView()
-            self.window.show_view(ch4_MenuView)
+            self.window.show_view(menu_View)
         elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+
+class winView(arcade.View):
+    def __init__(self):
+        super().__init__()
+    
+    def on_show(self):
+        arcade.set_background_color(arcade.color.GHOST_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+    
+    def on_mouse_press(self, x, y, button, modifiers):
+        pass
+
+
+class Scoreboard(arcade.View):
+    def __init__(self):
+        super().__init__()
+    
+    def on_show(self):
+        arcade.set_background_color(arcade.color.GHOST_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+    
+    def update(self, delta_time):
+        pass
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        pass
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
             self.director.next_view()
 
 
@@ -342,7 +401,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = Username()
+    my_view = gameView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
