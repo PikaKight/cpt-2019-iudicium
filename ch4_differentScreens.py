@@ -19,7 +19,7 @@ health_bar_width = 200
 
 # Slime
 slime_health = 100
-slime_strength = 2
+slime_strength = 5
 
 
 class Player(arcade.Sprite):
@@ -174,6 +174,9 @@ class gameView(arcade.View):
     def __init__(self):
         super().__init__()
 
+        # Frame Count
+        self.frame_count = 0
+
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
         self.slime_list = arcade.SpriteList()
@@ -222,11 +225,14 @@ class gameView(arcade.View):
 
         self.all_sprite_list.update()
 
+        self.frame_count += 1
+
         # Player and Slime Collision
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
 
         for collision in collisions:
-            player_health -= slime_strength * 2
+            if self.frame_count % 10 == 0:
+                player_health -= slime_strength
         
         # Player Attacks Slime
         for slime in self.slime_list:
