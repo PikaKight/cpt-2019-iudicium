@@ -102,101 +102,47 @@ class ch4_MenuView(arcade.View):
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            game_View = gameView()
-            self.window.show_view(game_View)
+            user_name = Username()
+            self.window.show_view(user_name)
         elif key == arcade.key.ESCAPE:
             self.director.next_view()
 
 
-class Make_WordView(arcade.View):
+class Username(arcade.View):
     def __init__(self):
         super().__init__()
 
         # Sprite Lists
-        self.all_sprite_list = arcade.SpriteList()
-        self.letters_list = arcade.SpriteList()
+        # self.dialogue_box_list = arcade.SpriteList()
 
-        # Sort Box
-        self.sort_box = arcade.Sprite("Sprites/Brown.png", 0.2)
-        self.sort_box.center_x = 80
-        self.sort_box.center_y = 510
-
-        self.all_sprite_list.append(self.sort_box)
-
-        # Letters
-        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        random_order = random.sample(alphabet, 26)
-        letter_x = 50
-        letter_x1 = letter_x
-        letter_x2 = letter_x
-        letter_x3 = letter_x
-        letter_x4 = letter_x
-        letter_y = 450
-
-        # Organize letters 6 by 4 in random order
-        for i, letter in enumerate(random_order):
-            if i <= 5:
-                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
-                self.letter.center_x = letter_x
-                self.letter.center_y = letter_y
-                self.letters_list.append(self.letter)
-                self.all_sprite_list.append(self.letter)
-                letter_x += 60
-            elif i > 5 and i <= 11:
-                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
-                self.letter.center_x = letter_x1
-                self.letter.center_y = letter_y - 60
-                self.letters_list.append(self.letter)
-                self.all_sprite_list.append(self.letter)
-                letter_x1 += 60
-            elif i > 11 and i <= 17:
-                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
-                self.letter.center_x = letter_x2
-                self.letter.center_y = letter_y - 120
-                self.letters_list.append(self.letter)
-                self.all_sprite_list.append(self.letter)
-                letter_x2 += 60
-            elif i > 17 and i <= 23:
-                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
-                self.letter.center_x = letter_x3
-                self.letter.center_y = letter_y - 180
-                self.letters_list.append(self.letter)
-                self.all_sprite_list.append(self.letter)
-                letter_x3 += 60
-            else:
-                self.letter = arcade.Sprite(f"Sprites/Marble_Letters/letter_{letter}.png", 0.2)
-                self.letter.center_x = letter_x4
-                self.letter.center_y = letter_y - 240
-                self.letters_list.append(self.letter)
-                self.all_sprite_list.append(self.letter)
-                letter_x4 += 60
-
-    def on_show(self):
-        arcade.set_background_color(arcade.color.FLORAL_WHITE)
+        self.dialogue_box = arcade.Sprite("Sprites/DialogueBox.png", 1)
+        self.dialogue_box.center_x = settings.WIDTH/2
+        self.dialogue_box.center_y = settings.HEIGHT/2
+        # self.dialogue_box_list.append(self.dialogue_box)
     
+    def on_show(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
     def on_draw(self):
         arcade.start_render()
-        self.all_sprite_list.draw()
 
-        # Sort
-        arcade.draw_text("Sort", self.sort_box.center_x, self.sort_box.center_y,
-                        arcade.color.AQUAMARINE, font_size=18, anchor_x="center", anchor_y="center")
-        
-        # Instructions
-    
-    def on_update(self, delta_time):
-        pass
+        self.dialogue_box.draw()
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        # Click on Sort button, sort alphabet
-        
-        # if arcade.collides_with_point([x, y], self.all_sprite_list):
-        #     print("HIT")
-        pass
+        arcade.draw_text("Username", self.dialogue_box.center_x, self.dialogue_box.center_y + 190,
+                        arcade.color.BLACK, font_size=25, bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("Enter a username that will be saved onto the scoreboard",
+                        self.dialogue_box.center_x, self.dialogue_box.center_y + 90, arcade.color.BLACK,
+                        font_size=15, anchor_x="center",anchor_y="center")
+
+    def update(self, delta_time):
+        self.dialogue_box.update()
 
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.ESCAPE:
-            self.director.next_view()       
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
 
 
 class gameView(arcade.View):
@@ -289,7 +235,6 @@ class gameView(arcade.View):
             if self.frame_count % 10 == 0:
                 self.total_damage += slime_strength
                 player_health -= slime_strength
-        print(self.total_damage)
         
         # Player Attacks Slime
         for slime in self.slime_list:
@@ -308,8 +253,8 @@ class gameView(arcade.View):
 
         # Player HP reaches 0
         if player_health <= 0:
-            gameOverView = gameOverView()
-            self.window.show_view(gameOverView)
+            gameOver_View = gameOverView()
+            self.window.show_view(gameOver_View)
     
     def on_mouse_press(self, x, y, button, modifiers):
         self.laser = arcade.Sprite("Sprites/laserBlue.png", 0.8)
@@ -379,8 +324,8 @@ class gameOverView(arcade.View):
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            game_View = gameView()
-            self.window.show_view(game_View)
+            menu_View = ch4_MenuView()
+            self.window.show_view(ch4_MenuView)
         elif key == arcade.key.ESCAPE:
             self.director.next_view()
 
@@ -397,7 +342,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = gameView()
+    my_view = Username()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
