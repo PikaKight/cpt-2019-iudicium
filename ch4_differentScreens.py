@@ -11,7 +11,6 @@ player_strength = 25
 laser_speed = 8
 
 # Health Bar
-# player_health = 100
 health_barx = 10
 health_bary = 570
 health_bar_height = 20
@@ -60,8 +59,6 @@ class Fish(Slime):
 
 
 def fish(self):
-    # global player_health
-
     if len(self.fish_list) == 0:
         if self.player_health <= 50 and self.frame_count % 200 == 0:
             self.fish = Fish("Sprites/fishPink.png", 0.3)
@@ -102,8 +99,37 @@ class ch4_MenuView(arcade.View):
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            user_name = Username()
-            self.window.show_view(user_name)
+            instructions_View = Instructions()
+            self.window.show_view(instructions_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+
+class Instructions(arcade.View):
+    def __init__(self):
+        super().__init__()
+    
+    def on_show(self):
+        arcade.set_background_color(arcade.color.GHOST_WHITE)
+    
+    def on_draw(self):
+        arcade.start_render()
+
+        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT/2 + 150, arcade.color.BLACK,
+                        font_size=30, bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("""    Use W A S D keys to move around. Left-click on the mouse to shoot.
+
+        Slimes are the enemy.
+        Fish are food that will recover your health.
+
+    GOAL: Defeat all the enemies as fast as possible using the least amount of lasers.""", settings.WIDTH/2,
+                        settings.HEIGHT/2, arcade.color.BLACK, font_size=15,
+                        anchor_x="center", anchor_y="center")
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_View = gameView()
+            self.window.show_view(game_View)
         elif key == arcade.key.ESCAPE:
             self.director.next_view()
 
@@ -244,7 +270,7 @@ class gameView(arcade.View):
         fish(self)
 
     def on_update(self, delta_time):
-        global slime_health #player_health
+        global slime_health
 
         self.all_sprite_list.update()
 
@@ -401,7 +427,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = gameView()
+    my_view = Instructions()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
