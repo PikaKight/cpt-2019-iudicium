@@ -213,7 +213,7 @@ class gameView(arcade.View):
         self.total_lasers = 0
 
         # Total Damage
-        # self.total_damage = 0
+        self.total_damage = 0
 
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
@@ -281,16 +281,15 @@ class gameView(arcade.View):
         self.frame_count += 1
         self.total_time += delta_time
 
-        # Recursively Draw Fish
-
-
         # Player and Slime Collision
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
 
         # Decrease Player Health when collision with slime and every 10 frames
         for collision in collisions:
             if self.frame_count % 10 == 0:
+                self.total_damage += slime_strength
                 player_health -= slime_strength
+        print(self.total_damage)
         
         # Player Attacks Slime
         for slime in self.slime_list:
