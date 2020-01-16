@@ -154,6 +154,8 @@ class Make_WordView(arcade.View):
         # Sort
         arcade.draw_text("Sort", self.sort_box.center_x, self.sort_box.center_y,
                         arcade.color.AQUAMARINE, font_size=18, anchor_x="center", anchor_y="center")
+        
+        # Instructions
     
     def on_update(self, delta_time):
         pass
@@ -177,6 +179,9 @@ class gameView(arcade.View):
         # Frame Count
         self.frame_count = 0
 
+        # Timer
+        self.total_time = 0.0
+
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
         self.slime_list = arcade.SpriteList()
@@ -197,6 +202,7 @@ class gameView(arcade.View):
             slime_sprite.center_y = random.randrange(settings.HEIGHT)
             slime_sprite.change_x = random.randrange(-4, 4)
             slime_sprite.change_y = random.randrange(-4, 4)
+            self.slime_health = 100
             if slime_sprite.change_x  == 0 or slime_sprite.change_y == 0:
                 slime_sprite.change_x = 1
                 slime_sprite.change_y = -1
@@ -212,6 +218,16 @@ class gameView(arcade.View):
 
         self.all_sprite_list.draw()
 
+        # Calculate time
+        minutes = int(self.total_time) // 60
+        seconds = int(self.total_time) % 60
+
+        output = f"Time: {minutes:02d}:{seconds:02d}"
+
+        # Timer
+        arcade.draw_text(output, settings.WIDTH - 50, settings.HEIGHT - 25,
+                        arcade.color.BLACK_LEATHER_JACKET, font_size=15, anchor_x="center")
+
         # Player Health Bar
         arcade.draw_xywh_rectangle_filled(health_barx, health_bary, health_bar_width,
                                             health_bar_height, arcade.color.BLACK)
@@ -226,33 +242,30 @@ class gameView(arcade.View):
         self.all_sprite_list.update()
 
         self.frame_count += 1
+        self.total_time += delta_time
 
         # Player and Slime Collision
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
 
+        # Decrease Player Health when collision with slime and every 10 frames
         for collision in collisions:
             if self.frame_count % 10 == 0:
                 player_health -= slime_strength
         
         # Player Attacks Slime
         for slime in self.slime_list:
-            times_hit = 0
             for laser in self.laser_list:
                 if arcade.check_for_collision_with_list(laser, self.slime_list):
-                    times_hit += 1
+                    self.slime_health -= player_strength
                     laser.remove_from_sprite_lists()
 
             # Laser flies off screen
                 if laser.left > settings.WIDTH or laser.right < 0 or laser.bottom > settings.HEIGHT or laser.top < 0:
                     laser.remove_from_sprite_lists()
 
-            if times_hit == 4:
-                slime.remove_from_sprite_lists()
-
         # Slime HP reaches 0
-        # for slime in self.slime_list:
-        #     if slime_health <= 0:
-        #         slime.remove_from_sprite_lists()
+            if self.slime_health <= 0:
+                slime.remove_from_sprite_lists()
 
         # Player HP reaches 0
         if player_health <= 0:
