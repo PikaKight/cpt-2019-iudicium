@@ -19,7 +19,10 @@ health_bar_width = 200
 
 # Slime
 slime_health = 100
-slime_strength = 5
+slime_strength = 10
+
+# Fish
+recovery_points = 25
 
 
 class Player(arcade.Sprite):
@@ -50,6 +53,30 @@ class Slime(arcade.Sprite):
             self.change_x *= -1
         if self.bottom < 0 or self.top > settings.HEIGHT:
             self.change_y *= -1
+
+
+class Fish(Slime):
+    pass
+
+
+def fish(self):
+    global player_health
+
+    if len(self.fish_list) == 0:
+        if player_health <= 50 and self.frame_count % 200 == 0:
+            self.fish = Fish("Sprites/fishPink.png", 0.3)
+            self.fish.center_x = random.randrange(20, settings.WIDTH - 20)
+            self.fish.center_y = random.randrange(20, settings.HEIGHT - 20)
+            self.fish.change_x = random.randrange(-4, 4)
+            self.fish.change_y = random.randrange(-4, 4)
+
+            self.fish_list.append(self.fish)
+            self.all_sprite_list.append(self.fish)
+
+    if len(self.fish_list) <= 1 and arcade.check_for_collision_with_list(self.player, self.fish_list):
+        player_health += recovery_points
+        self.fish.remove_from_sprite_lists()
+        fish(self)
 
 
 class ch4_MenuView(arcade.View):
@@ -182,10 +209,17 @@ class gameView(arcade.View):
         # Timer
         self.total_time = 0.0
 
+        # Total Lasers
+        self.total_lasers = 0
+
+        # Total Damage
+        # self.total_damage = 0
+
         # Sprite Lists
         self.all_sprite_list = arcade.SpriteList()
         self.slime_list = arcade.SpriteList()
         self.laser_list = arcade.SpriteList()
+        self.fish_list = arcade.SpriteList()
 
         # PLAYER Sprite
         self.player = Player("Sprites/alienBlue_front.png", 0.3)
@@ -196,23 +230,23 @@ class gameView(arcade.View):
 
         # SLIME Sprite
         for i in range(8):
-            slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
+            self.slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
 
-            slime_sprite.center_x = random.randrange(settings.WIDTH)
-            slime_sprite.center_y = random.randrange(settings.HEIGHT)
-            slime_sprite.change_x = random.randrange(-4, 4)
-            slime_sprite.change_y = random.randrange(-4, 4)
+            self.slime_sprite.center_x = random.randrange(settings.WIDTH)
+            self.slime_sprite.center_y = random.randrange(settings.HEIGHT)
+            self.slime_sprite.change_x = random.randrange(-4, 4)
+            self.slime_sprite.change_y = random.randrange(-4, 4)
             self.slime_health = 100
-            if slime_sprite.change_x  == 0 or slime_sprite.change_y == 0:
-                slime_sprite.change_x = 1
-                slime_sprite.change_y = -1
+            if self.slime_sprite.change_x  == 0 or self.slime_sprite.change_y == 0:
+                self.slime_sprite.change_x = 1
+                self.slime_sprite.change_y = -1
 
-            self.slime_list.append(slime_sprite)
-            self.all_sprite_list.append(slime_sprite)
+            self.slime_list.append(self.slime_sprite)
+            self.all_sprite_list.append(self.slime_sprite)
 
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
-    
+
     def on_draw(self):
         arcade.start_render()
 
@@ -235,7 +269,10 @@ class gameView(arcade.View):
                                             health_bar_height, arcade.color.GUPPIE_GREEN)
         arcade.draw_text(f"{player_health}/100", health_barx, health_bary - 25,
                         arcade.color.BLACK, font_size=15)
-    
+
+        # Fish
+        fish(self)
+
     def on_update(self, delta_time):
         global player_health, slime_health
 
@@ -243,6 +280,9 @@ class gameView(arcade.View):
 
         self.frame_count += 1
         self.total_time += delta_time
+
+        # Recursively Draw Fish
+
 
         # Player and Slime Collision
         collisions = arcade.check_for_collision_with_list(self.player, self.slime_list)
@@ -295,7 +335,8 @@ class gameView(arcade.View):
         self.laser.change_x = math.cos(angle) * laser_speed
         self.laser.change_y = math.sin(angle) * laser_speed
 
-        # Add laser to list
+        # Add laser to list and update total laser count
+        self.total_lasers += 1
         self.laser_list.append(self.laser)
         self.all_sprite_list.append(self.laser)
 
