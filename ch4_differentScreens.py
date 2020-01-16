@@ -108,6 +108,8 @@ class ch4_MenuView(arcade.View):
 class Instructions(arcade.View):
     def __init__(self):
         super().__init__()
+
+        # self.background = arcade.load_texture("Sprites/whiteFlower_blackBackground.jpg")
     
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
@@ -115,6 +117,8 @@ class Instructions(arcade.View):
     def on_draw(self):
         arcade.start_render()
 
+        # arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
+        #                                 settings.WIDTH, settings.HEIGHT, self.background)
         arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT/2 + 150, arcade.color.BLACK,
                         font_size=30, bold=True, anchor_x="center", anchor_y="center")
         arcade.draw_text("""    Use W A S D keys to move around. Left-click on the mouse to shoot.
@@ -305,6 +309,11 @@ class gameView(arcade.View):
         if self.player_health <= 0:
             gameOver_View = gameOverView()
             self.window.show_view(gameOver_View)
+        
+        # All slimes defeated
+        if len(self.slime_list) == 0:
+            win_View = winView()
+            self.window.show_view(win_View)
     
     def on_mouse_press(self, x, y, button, modifiers):
         self.laser = arcade.Sprite("Sprites/laserBlue.png", 0.8)
@@ -389,6 +398,8 @@ class winView(arcade.View):
     
     def on_draw(self):
         arcade.start_render()
+        arcade.draw_text("WIN", settings.WIDTH/2, settings.HEIGHT/2, arcade.color.BLACK, font_size=30,
+                        bold=True, anchor_x="center", anchor_y="center")
     
     def on_mouse_press(self, x, y, button, modifiers):
         pass
