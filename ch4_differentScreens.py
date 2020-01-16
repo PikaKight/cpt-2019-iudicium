@@ -102,6 +102,7 @@ class ch4_MenuView(arcade.View):
             instructions_View = Instructions()
             self.window.show_view(instructions_View)
         elif key == arcade.key.ESCAPE:
+            arcade.close_window()
             self.director.next_view()
 
 
@@ -135,6 +136,7 @@ class Instructions(arcade.View):
             game_View = gameView()
             self.window.show_view(game_View)
         elif key == arcade.key.ESCAPE:
+            arcade.close_window()
             self.director.next_view()
 
 
@@ -353,6 +355,7 @@ class gameView(arcade.View):
         elif key == arcade.key.A:
             self.player.change_x = -player_speedx
         elif key == arcade.key.ESCAPE:
+            arcade.close_window()
             self.director.next_view()       
 
     def on_key_release(self, key, modifiers):
@@ -386,6 +389,7 @@ class gameOverView(arcade.View):
             menu_View = ch4_MenuView()
             self.window.show_view(menu_View)
         elif key == arcade.key.ESCAPE:
+            arcade.close_window()
             self.director.next_view()
 
 
@@ -398,22 +402,44 @@ class winView(arcade.View):
     
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("WIN", settings.WIDTH/2, settings.HEIGHT/2, arcade.color.BLACK, font_size=30,
-                        bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("CONGRATULATIONS! YOU WIN", settings.WIDTH/2, settings.HEIGHT/2 + 100,
+                        arcade.color.BLACK, font_size=30, bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("""Press ENTER to see Scoreboard
+
+    Press ESC to Exit Game""", settings.WIDTH/2, settings.HEIGHT/2,
+                        arcade.color.BLACK, font_size=20, anchor_x="center", anchor_y="center")
     
-    def on_mouse_press(self, x, y, button, modifiers):
-        pass
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            scoreboard_View = Scoreboard()
+            self.window.show_view(scoreboard_View)
+        elif key == arcade.key.ESCAPE:
+            arcade.close_window()
+            self.director.next_view()
 
 
 class Scoreboard(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.menu = arcade.Sprite("Sprites/Menu.png", 0.8)
+        self.menu.center_x = settings.WIDTH/2
+        self.menu.center_y = settings.HEIGHT/2
     
     def on_show(self):
-        arcade.set_background_color(arcade.color.GHOST_WHITE)
+        arcade.set_background_color(arcade.color.BLACK)
     
     def on_draw(self):
         arcade.start_render()
+
+        self.menu.draw()
+
+        arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
+                        font_size=30, bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("""Top 5 Players that completed
+the game in the shortest time:""", self.menu.center_x,
+                        self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
+                        anchor_x="center", anchor_y="center")
     
     def update(self, delta_time):
         pass
@@ -423,6 +449,7 @@ class Scoreboard(arcade.View):
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
+            arcade.close_window()
             self.director.next_view()
 
 
@@ -438,7 +465,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = Instructions()
+    my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
