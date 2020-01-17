@@ -92,18 +92,37 @@ class Ch3View(arcade.View):
         self.x = 0
         self.half_width = settings.WIDTH * .5
         self.half_height = settings.HEIGHT * .5
-        self.button = settings.button
         self.player = Player("Sprites/alienBlue_front.png", .4, 0, 0, 0, 0, 400, 300)
         self.text_sprite = arcade.Sprite("Sprites\Brown.png", .5, 0 ,0, 0, 0, 400, 590)
         self.text_box = arcade.Sprite("Sprites\DialogueBox.png", 1, 0,0,0,0, 400, 300)
-        self.button_1 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 570)
-        self.button_2 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 75)
-        self.button_3 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 570)
-        self.button_4 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 75)
+
+    def button_on(self, value):
+        if value is 1:
+            self.button_1 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 570)
+        elif value is 2:
+            self.button_2 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 75)
+        elif value is 3:   
+            self.button_3 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 570)
+        elif value is 4:    
+            self.button_4 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 75)
+
+    def button_off(self, value):    
+            if value is 1:
+                self.button_1 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 570)
+            elif value is 2:
+                self.button_2 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 75)
+            elif value is 3:   
+                self.button_3 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 570)
+            elif value is 4:    
+                self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        
+        self.button_off(1)
+        self.button_off(2)
+        self.button_off(3)
+        self.button_off(4)
+
 
     def on_draw(self):
         arcade.start_render()
