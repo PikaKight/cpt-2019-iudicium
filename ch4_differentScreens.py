@@ -1,6 +1,7 @@
 import arcade
 import random
 import math
+import json
 import settings
 
 
@@ -110,7 +111,14 @@ class Instructions(arcade.View):
     def __init__(self):
         super().__init__()
 
-        # self.background = arcade.load_texture("Sprites/whiteFlower_blackBackground.jpg")
+        self.background = arcade.load_texture("Sprites/blackBackground.jpg")
+
+        self.slime = arcade.Sprite("Sprites/slimeGreen.png", 0.6)
+        self.slime.center_x = settings.WIDTH/2 - 70
+        self.slime.center_y = 200
+        self.fish = arcade.Sprite("Sprites/fishPink.png", 0.6)
+        self.fish.center_x = settings.WIDTH/2 + 70
+        self.fish.center_y = 190
     
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
@@ -118,18 +126,26 @@ class Instructions(arcade.View):
     def on_draw(self):
         arcade.start_render()
 
-        # arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
-        #                                 settings.WIDTH, settings.HEIGHT, self.background)
-        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT/2 + 150, arcade.color.BLACK,
+        arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
+                                        settings.WIDTH, settings.HEIGHT, self.background)
+        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT/2 + 150, arcade.color.WHITE,
                         font_size=30, bold=True, anchor_x="center", anchor_y="center")
-        arcade.draw_text("""    Use W A S D keys to move around. Left-click on the mouse to shoot.
+        arcade.draw_text("""Use W A S D keys to move around. 
+Left-click on the mouse to shoot.
 
-        Slimes are the enemy.
-        Fish are food that will recover your health.
 
-    GOAL: Defeat all the enemies as fast as possible using the least amount of lasers.""", settings.WIDTH/2,
-                        settings.HEIGHT/2, arcade.color.BLACK, font_size=15,
-                        anchor_x="center", anchor_y="center")
+Slimes are the enemy.
+
+Fish are food that will recover your health.
+
+
+GOAL: Defeat all the enemies as fast as possible using 
+the least amount of lasers.""",
+                        settings.WIDTH/2, settings.HEIGHT/2 + 40, arcade.color.WHITE,
+                        font_size=15, anchor_x="center", anchor_y="center")
+        
+        self.slime.draw()
+        self.fish.draw()
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
@@ -314,9 +330,14 @@ class gameView(arcade.View):
         
         # All slimes defeated
         if len(self.slime_list) == 0:
+            game_stats = {f"{self.total_time}": {"Total Damage Taken": self.total_damage,
+                                            "Total Lasers Used":self.total_lasers}}
+            with open("ch4_scores.json", "w") as f:
+                json.dump(game_stats, f)
+
             win_View = winView()
             self.window.show_view(win_View)
-    
+
     def on_mouse_press(self, x, y, button, modifiers):
         self.laser = arcade.Sprite("Sprites/laserBlue.png", 0.8)
 
@@ -396,19 +417,26 @@ class gameOverView(arcade.View):
 class winView(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.confetti = arcade.Sprite("Sprites/confetti.png", 1)
+        self.confetti.center_x = settings.WIDTH/2
+        self.confetti.center_y = settings.HEIGHT/2
     
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
     
     def on_draw(self):
         arcade.start_render()
+
+        self.confetti.draw()
+
         arcade.draw_text("CONGRATULATIONS! YOU WIN", settings.WIDTH/2, settings.HEIGHT/2 + 100,
                         arcade.color.BLACK, font_size=30, bold=True, anchor_x="center", anchor_y="center")
         arcade.draw_text("""Press ENTER to see Scoreboard
 
     Press ESC to Exit Game""", settings.WIDTH/2, settings.HEIGHT/2,
                         arcade.color.BLACK, font_size=20, anchor_x="center", anchor_y="center")
-    
+
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
             scoreboard_View = Scoreboard()
@@ -436,10 +464,12 @@ class Scoreboard(arcade.View):
 
         arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
                         font_size=30, bold=True, anchor_x="center", anchor_y="center")
-        arcade.draw_text("""Top 5 Players that completed
-the game in the shortest time:""", self.menu.center_x,
+        arcade.draw_text("""    Top 5 Players that completed
+    the game in the shortest time:""", self.menu.center_x,
                         self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
                         anchor_x="center", anchor_y="center")
+        arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
+                        arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
     
     def update(self, delta_time):
         pass
