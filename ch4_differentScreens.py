@@ -74,7 +74,7 @@ def fish(self):
         self.player_health += recovery_points
         self.fish.remove_from_sprite_lists()
         fish(self)
-0
+
 
 class ch4_MenuView(arcade.View):
     def __init__(self):
@@ -189,11 +189,11 @@ class gameView(arcade.View):
         self.all_sprite_list.append(self.player)
 
         # SLIME Sprite
-        for i in range(8):
+        for i in range(1):
             slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
 
-            slime_sprite.center_x = random.randrange(settings.WIDTH)
-            slime_sprite.center_y = random.randrange(settings.HEIGHT)
+            slime_sprite.center_x = random.randrange(5, settings.WIDTH - 5)
+            slime_sprite.center_y = random.randrange(5, settings.HEIGHT - 5)
             slime_sprite.change_x = random.randrange(-4, 4)
             slime_sprite.change_y = random.randrange(-4, 4)
             slime_sprite.health = 100
@@ -274,6 +274,14 @@ class gameView(arcade.View):
         
         # All slimes defeated
         if len(self.slime_list) == 0:
+            with open("ch4_scores.json", "r") as f:
+                data = json.load(f)
+            game_stats = {}
+            game_stats[f"{self.total_time}"] = {"Total Damage Taken": self.total_damage, "Total Lasers Used":self.total_lasers}
+            data["game_stats"].append(game_stats)
+            with open("ch4_scores.json", "w") as f:
+                json.dump(data, f)
+
             win_View = winView()
             self.window.show_view(win_View)
 
@@ -375,12 +383,6 @@ class winView(arcade.View):
 
     Press ESC to Exit Game""", settings.WIDTH/2, settings.HEIGHT/2,
                         arcade.color.BLACK, font_size=20, anchor_x="center", anchor_y="center")
-    
-    def update(self, delta_time):
-        game_stats = {f"{self.total_time}": {"Total Damage Taken": self.total_damage,
-                                            "Total Lasers Used":self.total_lasers}}
-        with open("ch4_scores.json", "w") as f:
-            json.dump(game_stats, f)
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
@@ -415,7 +417,7 @@ class Scoreboard(arcade.View):
                         anchor_x="center", anchor_y="center")
         arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
-    
+
     def update(self, delta_time):
         pass
 
