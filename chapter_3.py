@@ -3,35 +3,6 @@ import arcade
 import settings
 speed = 6
 
-class ShowButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Show", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if not self.dialoguebox.active:
-            self.pressed = True
-
-    def on_release(self):
-        if self.pressed:
-            self.pressed = False
-            self.dialoguebox.active = True
-
-
-class CloseButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if self.dialoguebox.active:
-            self.pressed = True
-
-    def on_release(self):
-        if self.pressed and self.dialoguebox.active:
-            self.pressed = False
-            self.dialoguebox.active = False
-
 class Player(arcade.Sprite):
     def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
         super().__init__(filename=filename, scale=scale, image_x=image_x, image_y=image_y, image_width=image_width, image_height=image_height, center_x=center_x, center_y=center_y, repeat_count_x=repeat_count_x, repeat_count_y=repeat_count_y)
@@ -78,8 +49,41 @@ class Player(arcade.Sprite):
             if self.right >= 445 and self.right <= 545:
                 self.top = 448
 
-        
-        
+class Puzzle:
+    
+    solution = [1, 4, 2, 3]
+
+    def __init__(self):
+        self._puzzle = []   
+
+    def clone_puzzle(self):
+        self.clone = self._puzzle
+
+    def add_value(self, value):
+        self._puzzle.append
+
+    def remove_value(self, value):
+        self._puzzle.remove(value)
+
+    def give_puzzle(self):
+        return self._puzzle
+
+    def puzzle_checker(self, puzzle, value):
+        if len(puzzle) == 1:
+            if puzzle[0] is value:
+                return True
+            else:
+                return False
+
+        mid = len(puzzle) // 2
+
+        left =  self.puzzle_checker(puzzle[:mid], value)
+        right = self.puzzle_checker(puzzle[mid:], value)
+
+        if left or right is True:
+            return True
+        else:
+            return False       
         
         
 class Ch3View(arcade.View):
@@ -99,10 +103,7 @@ class Ch3View(arcade.View):
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        self.set_theme()
-        self.add_dialogue_box()
-        self.add_text()
-        self.add_button()
+        
 
     def on_draw(self):
         arcade.start_render()
@@ -123,40 +124,6 @@ class Ch3View(arcade.View):
         if self.x == 1:
             super().on_draw()
 
-    def add_dialogue_box(self):
-        color = (220, 228, 255)
-        dialoguebox = arcade.gui.DialogueBox(self.half_width, self.half_height, self.half_width*1.1, self.half_height*1.1, None, self.theme)
-        close_button = CloseButton(dialoguebox, self.half_width, self.half_height-(self.half_height/2) + 40,
-                                   theme=self.theme)
-        dialoguebox.button_list.append(close_button)
-        message = "Hello I am a Dialogue Box."
-        dialoguebox.text_list.append(arcade.gui.Text(message, self.half_width, self.half_height, self.theme.font_color))
-        self.dialogue_box_list.append(dialoguebox)
-
-    def add_text(self):
-        message = "Press this button to activate the Dialogue Box"
-        self.text_list.append(arcade.gui.Text(message, self.half_width-50, self.half_height))
-
-    def add_button(self):
-        show_button = ShowButton(self.dialogue_box_list[0], settings.WIDTH-100, self.half_height, theme=self.theme)
-        self.button_list.append(show_button)
-
-    def set_dialogue_box_texture(self):
-        dialogue_box = ":resources:gui_themes/Fantasy/DialogueBox/DialogueBox.png"
-        self.theme.add_dialogue_box_texture(dialogue_box)
-    
-    def set_button_texture(self):
-        normal = ":resources:gui_themes/Fantasy/Buttons/Normal.png"
-        hover = ":resources:gui_themes/Fantasy/Buttons/Hover.png"
-        clicked = ":resources:gui_themes/Fantasy/Buttons/Clicked.png"
-        locked = ":resources:gui_themes/Fantasy/Buttons/Locked.png"
-        self.theme.add_button_textures(normal, hover, clicked, locked)
-
-    def set_theme(self):
-        self.theme = arcade.gui.Theme()
-        self.set_dialogue_box_texture()
-        self.set_button_texture()
-        self.theme.set_font(24, arcade.color.WHITE)
 
     def update(self, delta_time):
         self.player.update()
@@ -231,10 +198,8 @@ class Ch3View(arcade.View):
 if __name__ == "__main__":
     """This section of code will allow you to run your View
     independently from the main.py file and its Director.
-
     You can ignore this whole section. Keep it at the bottom
     of your code.
-
     It is advised you do not modify it unless you really know
     what you are doing.
     """
@@ -243,7 +208,4 @@ if __name__ == "__main__":
     my_view = Ch3View()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
-    # music = arcade.Sound("End_of_Time.mp3")
-    # music.play()
     arcade.run()
-
