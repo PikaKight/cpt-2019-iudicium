@@ -326,6 +326,8 @@ def main():
 
 
 class Chapter1View(arcade.View):
+    def __init__(self):
+        super().__init__()
     def on_show(self):
         # arcade.set_background_color(arcade.color.WHITE)
         self.window = game = MyGame(WIDTH, HEIGHT, "My Game")
