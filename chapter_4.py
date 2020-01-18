@@ -54,8 +54,8 @@ class Slime(arcade.Sprite):
             self.change_y *= -1
 
 
-# class Fish(Slime):
-#     pass
+class Fish(Slime):
+    pass
 
 
 def fish(self):
@@ -76,13 +76,13 @@ def fish(self):
         fish(self)
 
 
+# def sort_scores():
+
+
 class ch4_MenuView(arcade.View):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
-
-    def on_show(self):
-        pass
     
     def on_draw(self):
         arcade.start_render()
@@ -203,9 +203,6 @@ class gameView(arcade.View):
 
             self.slime_list.append(slime_sprite)
             self.all_sprite_list.append(slime_sprite)
-
-    def on_show(self):
-        arcade.set_background_color(arcade.color.GHOST_WHITE)
 
     def on_draw(self):
         arcade.start_render()
@@ -335,9 +332,6 @@ class gameOverView(arcade.View):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("Sprites/gameOver_screen.jpg")
-
-    def on_show(self):
-        pass
     
     def on_draw(self):
         arcade.start_render()
@@ -415,6 +409,11 @@ class Scoreboard(arcade.View):
                         anchor_x="center", anchor_y="center")
         arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
+        
+        # with open("chapter4_scores.json", "r") as f:
+        #     first_place = json.load[game_stats][]
+
+        # arcade.draw_text("1. ")
 
     def update(self, delta_time):
         pass
@@ -440,7 +439,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = gameView()
+    my_view = ch4_MenuView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
