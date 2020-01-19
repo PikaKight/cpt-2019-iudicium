@@ -20,6 +20,34 @@ class Player(arcade.Sprite):
         if self.top > settings.HEIGHT:
             self.top = settings.HEIGHT
 
+        #boundary of wall left up
+        if self.right > 185 and self.left < 180 and self.top > 338 and self.bottom < 464:
+            self.right = 184
+        if self.left < 212 and self.left > 190 and self.bottom < 435 and self.top > 338:
+            self.left = 212
+        if self.right > 185 and self.left < 312 and self.bottom < 464 and self.top > 460:
+            self.bottom = 464
+        if self.top > 435 and self.top < 450 and self.left >= 212 and self.left < 311:
+            self.top = 435
+        if self.top > 336 and self.bottom < 350 and self.left < 211 and self.right > 185:
+            self.top = 336
+        if self.left < 312 and self.right > 290 and self.bottom < 464 and self.top > 436: 
+            self.left = 312
+
+        #boundary of wall left down  
+        if self.right > 185 and self.left < 180 and self.top > 88 and self.bottom < 213:
+            self.right = 184
+        if self.left < 212 and self.left > 190 and self.bottom < 112 and self.top > 211:
+            self.left = 212
+        if self.right > 185 and self.left < 312 and self.bottom < 21 and self.top > 88:
+            self.top = 88
+        if self.bottom < 112 and self.top > 170 and self.left >= 212 and self.left < 311:
+            self.bottom = 112
+        if self.top > 336 and self.bottom < 213 and self.left < 211 and self.right > 185:
+            self.bottom = 213
+        if self.left < 312 and self.right > 290 and self.bottom < 464 and self.top > 436: 
+            self.left = 312
+
 class Puzzle:
     
     solution = [1, 4, 2, 3]
@@ -80,7 +108,6 @@ class Ch3View(arcade.View):
         self.background = arcade.load_texture("Sprites/tiledFloor.jpg")
 
 
-
     def button_on(self, value):
         if value is 1:
             self.button_1 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 570)
@@ -90,7 +117,6 @@ class Ch3View(arcade.View):
             self.button_3 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 570)
         elif value is 4:    
             self.button_4 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 75)
-
 
     def button_off(self, value):    
             if value is 1:
@@ -102,13 +128,11 @@ class Ch3View(arcade.View):
             elif value is 4:    
                 self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
 
-
     def on_show(self):
         self.button_off(1)
         self.button_off(2)
         self.button_off(3)
         self.button_off(4)
-
 
     def on_draw(self):
         arcade.start_render()
