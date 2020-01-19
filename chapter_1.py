@@ -18,7 +18,7 @@ end_window_time = 0
 _move_speed = 5
 
 TILE_SCALING = 1
-SPRITE_SCALING_PLAYER = 0.13
+SPRITE_SCALING_PLAYER = 0.15
 SPRITE_PIXEL_SIZE = 30
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
@@ -108,13 +108,9 @@ class MyGame(arcade.View):
         normal_key.center_x = random.randrange(1500)
         normal_key.center_y = random.randrange(1500)
 
-        # See if the key is hitting a wall
+        # See if the key is hitting a wall, hitting another key, or too close from each other
         wall_hit_list = arcade.check_for_collision_with_list(normal_key, self.wall_list)
-
-        # See if the key is hitting another key
         key_hit_list = arcade.check_for_collision_with_list(normal_key, self.key_list)
-
-        # See if the key is too close from each other
         flag = True
         for item_x in x_list:
             if abs(int(item_x - normal_key.center_x)) < 30:
@@ -122,10 +118,57 @@ class MyGame(arcade.View):
         for item_y in y_list:
             if abs(int(item_y - normal_key.center_y)) < 20:
                 flag = False
-        if len(wall_hit_list) == 0 and len(key_hit_list) == 0 and flag == True:
+        if len(wall_hit_list) == 0 and len(key_hit_list) == 0 and flag:
             key_placed_successfully = True
 
         return self.key_place_success(key_placed_successfully, normal_key, x_list, y_list)
+
+    # sort the distances between each key and the player
+    def sort_key(self, key_list) -> List:
+        """
+        Use bubble sort to sort all the keys in the list by distances.
+        Sort the distance from the closest to the furthest
+        Args:
+            key_list: A list of key sprites
+        Returns:
+            a sorted sprite list
+        """
+        for i in range(len(key_list)):
+            for j in range(len(key_list) - 1):
+                new_sprite = arcade.SpriteList()
+                key_1 = arcade.get_distance_between_sprites(self.player_sprite, key_list[j])
+                key_2 = arcade.get_distance_between_sprites(self.player_sprite, key_list[j + 1])
+                if key_1 > key_2:
+                    # Because of a spritelist cannot be modify, so I use another temperate list to append.
+                    temp = None
+                    for k in range(len(key_list)):
+                        if k == j:
+                            temp = key_list[j]
+                        elif k == j + 1:
+                            new_sprite.append(key_list[k])
+                            new_sprite.append(temp)
+                        # append values that does not need to be swap
+                        else:
+                            new_sprite.append(key_list[k])
+
+                    key_list = new_sprite
+        self.key.all_keys = key_list
+        return key_list
+
+    def linear_search_key(self, target: str, key_list: List) -> bool:
+        """
+          Use linear search to check if the special key is in the key list
+          Args:
+              target(str): the type of each key
+              key_list: A list of key sprites
+          Returns:
+              a sorted sprite list
+        """
+        for key in key_list:
+            if key._type == target:
+                self.flag_k = True
+                return self.flag_k
+        return self.flag_k
 
     def setup(self):
         """
@@ -141,7 +184,7 @@ class MyGame(arcade.View):
         self.score = 0
 
         # Set up the player
-        self.player_sprite = arcade.Sprite("images/Player.png", SPRITE_SCALING_PLAYER)
+        self.player_sprite = arcade.Sprite("Sprites/alienBlue_front.png", SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
 
@@ -216,11 +259,7 @@ class MyGame(arcade.View):
             # check of the player hit the door and press O to open
             if end_window and open_door:
                 self.flag_k = False
-                # if the special key does not in our key list, the player win the game
-                for i in self.key.all_keys:
-                    if i._type == "special":
-                        self.flag_k = True
-                if not self.flag_k:
+                if not self.linear_search_key("special", self.key.all_keys):
                     texture = arcade.load_texture("images/ending.png")
                     arcade.draw_texture_rectangle(self.view_left + WIDTH // 2, self.view_bottom + HEIGHT // 2, WIDTH,
                                                   HEIGHT, texture)
@@ -331,46 +370,11 @@ class MyGame(arcade.View):
 
         elif key == arcade.key.K:
             key_k = True
-            # start sort the distances
+            # sort the distances of the keys
             self.sort_key(self.key.all_keys)
 
         elif key == arcade.key.O:
             open_door = True
-
-    # sort the distances between each key and the player
-    def sort_key(self, key_list):
-        """
-        sort all the keys in the list by distances.
-        Sort the distance from the closest to the furthest
-        Args:
-            key_list: A list of key sprites
-        Returns:
-            a sorted sprite list
-        """
-        for i in range(len(key_list)):
-            for j in range(len(key_list) - 1):
-                new_sprite = arcade.SpriteList()
-                key_1 = arcade.get_distance_between_sprites(self.player_sprite, key_list[j])
-
-                key_2 = arcade.get_distance_between_sprites(self.player_sprite, key_list[j + 1])
-
-                if key_1 > key_2:
-                    # Because of a spritelist cannot be modify, so I use another temperate list to append.
-                    temp = None
-                    for k in range(len(key_list)):
-                        if k == j:
-                            temp = key_list[j]
-                        elif k == j + 1:
-                            new_sprite.append(key_list[k])
-                            new_sprite.append(temp)
-
-                        # append values that does not need to be swap
-                        else:
-                            new_sprite.append(key_list[k])
-
-                    key_list = new_sprite
-        self.key.all_keys = key_list
-        return key_list
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -381,28 +385,6 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = 0
         elif key == arcade.key.A or key == arcade.key.D:
             self.player_sprite.change_x = 0
-
-        # elif key == arcade.key.K:
-        #     key_k = False
-
-    def on_mouse_motion(self, x, y, delta_x, delta_y):
-        """
-        Called whenever the mouse moves.
-        """
-        pass
-
-    def on_mouse_press(self, x, y, button, key_modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
-        pass
-
-    def on_mouse_release(self, x, y, button, key_modifiers):
-        """
-        Called when a user releases a mouse button.
-        """
-        pass
-
 
 if __name__ == "__main__":
     """This section of code will allow you to run your View
