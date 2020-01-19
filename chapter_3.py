@@ -37,13 +37,13 @@ class Player(arcade.Sprite):
         #boundary of wall right up
         if self.right > 590 and self.left < 586 and self.top > 338 and self.bottom < 464:
             self.left = 586
-        if self.right < 560 and self.right > 570 and self.bottom < 435 and self.top > 338:
+        if self.right > 560 and self.right < 582 and self.bottom < 435 and self.top > 338:
             self.right = 560
         if self.right > 462 and self.left < 586 and self.bottom < 464 and self.top > 460:
             self.bottom = 464
-        if self.top > 435 and self.top < 450 and self.right >= 560 and self.right < 462:
+        if self.top > 435 and self.top < 450 and self.right <= 560 and self.right > 462:
             self.top = 435
-        if self.top > 336 and self.bottom < 350 and self.left < 586 and self.right > 560:
+        if self.top > 336 and self.bottom < 350 and self.left < 586 and self.right > 561:
             self.top = 336
         if self.left < 440 and self.right > 462 and self.bottom < 464 and self.top > 436: 
             self.right = 462
@@ -51,16 +51,30 @@ class Player(arcade.Sprite):
         #boundary of wall left down  
         if self.right > 185 and self.left < 180 and self.top > 88 and self.bottom < 213:
             self.right = 184
-        if self.left < 212 and self.right > 200 and self.bottom > 112 and self.top < 213:
+        if self.left < 212 and self.right > 200 and self.top > 111 and self.bottom < 213:
             self.left = 212
         if self.right > 185 and self.left < 312 and self.bottom < 21 and self.top > 88:
             self.top = 88
-        if self.bottom < 112 and self.top > 170 and self.left >= 212 and self.left < 311:
+        if self.bottom < 111 and self.bottom > 105 and self.left >= 212 and self.left < 311:
             self.bottom = 112
         if self.top > 336 and self.bottom < 213 and self.left < 211 and self.right > 185:
             self.bottom = 213
-        if self.left < 312 and self.right > 290 and self.bottom < 464 and self.top > 436: 
+        if self.left < 312 and self.right > 290 and self.top > 88 and self.bottom < 111: 
             self.left = 312
+
+        #boundary of wall lef right down  
+        if self.right > 590 and self.left < 586 and self.top > 88 and self.bottom < 213:
+            self.left = 586
+        if self.right > 560 and self.right < 582 and self.top > 111 and self.bottom < 213:
+            self.right = 560
+        if self.right > 462 and self.left < 586 and self.bottom < 21 and self.top > 88:
+            self.top = 88
+        if self.bottom < 111 and self.bottom > 105 and self.right <= 560 and self.right > 462:
+            self.bottom = 112
+        if self.top > 336 and self.bottom < 213 and self.left < 586 and self.right > 561:
+            self.bottom = 213
+        if self.left < 440 and self.right > 462 and self.top > 88 and self.bottom < 111: 
+            self.right = 462
 
 class Puzzle:
     
@@ -164,7 +178,11 @@ class Instructions(arcade.View):
         arcade.draw_text("""    Use W A S D keys to move around. 
     Space to turn the buttons on and off.
 
-    Press the buttons in 
+    Press the buttons in a certain order to unlock the next chapter.
+
+    For the riddle move up towards the brown sign and press space.
+
+    Press ENTER to 
 
     """,
                         settings.WIDTH/2, settings.HEIGHT/2 + 40, arcade.color.WHITE,
@@ -175,12 +193,99 @@ class Instructions(arcade.View):
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            ch3View = Ch3View()
-            self.window.show_view(ch3View)
+            riddle = Riddle()
+            self.window.show_view(riddle)
         elif key == arcade.key.ESCAPE:
             arcade.close_window()
             self.director.next_view()
-        
+
+class ShowButton(arcade.gui.TextButton):
+    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Show", theme=None):
+        super().__init__(x, y, width, height, text, theme=theme)
+        self.dialoguebox = dialoguebox
+
+    def on_press(self):
+        if not self.dialoguebox.active:
+            self.pressed = True
+
+    def on_release(self):
+        if self.pressed:
+            self.pressed = False
+            self.dialoguebox.active = True
+
+class CloseButton(arcade.gui.TextButton):
+    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close", theme=None):
+        super().__init__(x, y, width, height, text, theme=theme)
+        self.dialoguebox = dialoguebox
+
+    def on_press(self):
+        if self.dialoguebox.active:
+            self.pressed = True
+
+
+    def on_release(self):
+        if self.pressed and self.dialoguebox.active:
+            self.pressed = False
+            self.dialoguebox.active = False
+
+class Riddle(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.half_width = settings.WIDTH/2
+        self.half_height = settings.HEIGHT/2
+        self.theme = None
+
+    def add_dialogue_box(self):
+        color = (220, 228, 255)
+        dialoguebox = arcade.gui.DialogueBox(self.half_width, self.half_height, self.half_width*1.1,
+                                             self.half_height*1.5, color, self.theme)
+        close_button = CloseButton(dialoguebox, self.half_width, self.half_height-(self.half_height/2) + 40,
+                                   theme=self.theme)
+        dialoguebox.button_list.append(close_button)
+        message = "Hello I am a Dialogue Box."
+        dialoguebox.text_list.append(arcade.gui.Text(message, self.half_width, self.half_height, self.theme.font_color))
+        self.dialogue_box_list.append(dialoguebox)
+
+    def add_text(self):
+        message = "Press this button to activate the Dialogue Box"
+        self.text_list.append(arcade.gui.Text(message, self.half_width-50, self.half_height))
+
+    def add_button(self):
+        show_button = ShowButton(self.dialogue_box_list[0], settings.WIDTH-100, self.half_height, theme=self.theme)
+        self.button_list.append(show_button)
+
+    def set_dialogue_box_texture(self):
+        dialogue_box = "Sprites\DialogueBox (1).png"
+        self.theme.add_dialogue_box_texture(dialogue_box)
+
+    def set_button_texture(self):
+        normal = "Sprites/Normal.png"
+        hover = "Sprites\Hover.png"
+        clicked = "Sprites\Clicked.png"
+        locked = "Sprites\Locked.png"
+        self.theme.add_button_textures(normal, hover, clicked, locked)
+
+    def set_theme(self):
+        self.theme = arcade.gui.Theme()
+        self.set_dialogue_box_texture()
+        self.set_button_texture()
+        self.theme.set_font(24, arcade.color.WHITE)
+
+    def setup(self):
+        arcade.set_background_color(arcade.color.ALICE_BLUE)
+        self.set_theme()
+        self.add_dialogue_box()
+        self.add_text()
+        self.add_button()
+
+    def on_draw(self):
+        arcade.start_render()
+        super().on_draw()
+
+    def on_update(self, delta_time):
+        if self.dialogue_box_list[0].active:
+            return
+
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
@@ -318,8 +423,8 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = ch3_MenuView()
-    # my_view = Ch3View()
+    # my_view = ch3_MenuView()
+    my_view = Ch3View()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
