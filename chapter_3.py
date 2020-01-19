@@ -55,7 +55,7 @@ class Puzzle:
     solution = [1, 4, 2, 3]
 
     def __init__(self):
-        self._puzzle = []   
+        self._puzzle = []
 
 
     def clone_puzzle(self):
@@ -190,35 +190,35 @@ class Ch3View(arcade.View):
             if (self.player.center_x  >= 290 and self.player.center_x <= 515) and (self.player.center_y >= 555):
                 self.x = 1
 
-            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
                 self.button_on(1)
                 self.puzzle.add_value(1)
                 
-            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1):
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1):
                 self.button_off(1)
                 self.puzzle.remove_value(1)
                 
-            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False:
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False:
                 self.button_on(2)
                 self.puzzle.add_value(2)
                 
-            elif (self.player.left  >= 0 and self.player.center_x <= 120) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2):
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2):
                 self.button_off(2)
                 self.puzzle.remove_value(2)
                 
-            elif (self.player.center_x  >= 706) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
+            elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
                 self.button_on(3)
                 self.puzzle.add_value(3)
 
-            elif (self.player.center_x  >= 706) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
+            elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
                 self.button_off(3)
                 self.puzzle.remove_value(3)
                 
-            elif (self.player.center_x  >= 706) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
+            elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
                 self.button_on(4)
                 self.puzzle.add_value(4)
         
-            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
+            elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
                 self.button_off(4)
                 self.puzzle.remove_value(4)
                 
