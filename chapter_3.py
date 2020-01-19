@@ -20,10 +20,6 @@ class Player(arcade.Sprite):
         if self.top > settings.HEIGHT:
             self.top = settings.HEIGHT
 
-class Wall(arcade.Sprite):
-    def __init__(self, center_x=0, center_y=0):
-        super().__init__(center_x=center_x, center_y=center_y)
-
 class Puzzle:
     
     solution = [1, 4, 2, 3]
