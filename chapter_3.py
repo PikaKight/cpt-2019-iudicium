@@ -3,35 +3,6 @@ import arcade
 import settings
 speed = 6
 
-class ShowButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Show", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if not self.dialoguebox.active:
-            self.pressed = True
-
-    def on_release(self):
-        if self.pressed:
-            self.pressed = False
-            self.dialoguebox.active = True
-
-
-class CloseButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if self.dialoguebox.active:
-            self.pressed = True
-
-    def on_release(self):
-        if self.pressed and self.dialoguebox.active:
-            self.pressed = False
-            self.dialoguebox.active = False
-
 class Player(arcade.Sprite):
     def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
         super().__init__(filename=filename, scale=scale, image_x=image_x, image_y=image_y, image_width=image_width, image_height=image_height, center_x=center_x, center_y=center_y, repeat_count_x=repeat_count_x, repeat_count_y=repeat_count_y)
@@ -49,7 +20,7 @@ class Player(arcade.Sprite):
             self.bottom = 3
         if self.top > settings.HEIGHT:
             self.top = settings.HEIGHT
-        
+        """ 
         #boundary for inner left of the wall
         if self.left < 230 and self.right > 173: 
             if self.bottom <= 448 and self.top >= 346:
@@ -77,32 +48,96 @@ class Player(arcade.Sprite):
                 self.top = 448
             if self.right >= 445 and self.right <= 545:
                 self.top = 448
+        """
 
-        
-        
-        
+class Puzzle:
+    
+    solution = [1, 4, 2, 3]
+
+    def __init__(self):
+        self._puzzle = []   
+
+
+    def clone_puzzle(self):
+        self.clone = self._puzzle
+        return self.clone
+
+
+    def add_value(self, value):
+        self._puzzle.append(value)
+
+
+    def remove_value(self, value):
+        self._puzzle.remove(value)
+
+
+    def give_puzzle(self):
+        return self._puzzle
+
+
+    def value_checker(self, puzzle, value):
+        if len(puzzle) == 0:
+            return False
+
+        if len(puzzle) == 1:
+            if puzzle[0] is value:
+                return True
+            else:
+                return False
+
+        mid = len(puzzle) // 2
+
+        left =  self.value_checker(puzzle[:mid], value)
+        right = self.value_checker(puzzle[mid:], value)
+   
+        return left or right
+    
+
+    def checker(self):
+        if self._puzzle is Puzzle.solution:
+            return True
         
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
+        self.puzzle = Puzzle()
         self.x = 0
         self.half_width = settings.WIDTH * .5
         self.half_height = settings.HEIGHT * .5
-        self.button = settings.button
         self.player = Player("Sprites/alienBlue_front.png", .4, 0, 0, 0, 0, 400, 300)
         self.text_sprite = arcade.Sprite("Sprites\Brown.png", .5, 0 ,0, 0, 0, 400, 590)
         self.text_box = arcade.Sprite("Sprites\DialogueBox.png", 1, 0,0,0,0, 400, 300)
-        self.button_1 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 570)
-        self.button_2 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 50, 75)
-        self.button_3 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 570)
-        self.button_4 = arcade.Sprite(self.button, .7, 0 ,0, 0, 0, 750, 75)
+
+
+    def button_on(self, value):
+        if value is 1:
+            self.button_1 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 570)
+        elif value is 2:
+            self.button_2 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 75)
+        elif value is 3:   
+            self.button_3 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 570)
+        elif value is 4:    
+            self.button_4 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 75)
+
+
+    def button_off(self, value):    
+            if value is 1:
+                self.button_1 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 570)
+            elif value is 2:
+                self.button_2 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 75)
+            elif value is 3:   
+                self.button_3 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 570)
+            elif value is 4:    
+                self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
+
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        self.set_theme()
-        self.add_dialogue_box()
-        self.add_text()
-        self.add_button()
+        self.button_off(1)
+        self.button_off(2)
+        self.button_off(3)
+        self.button_off(4)
+
 
     def on_draw(self):
         arcade.start_render()
@@ -120,50 +155,19 @@ class Ch3View(arcade.View):
         self.button_3.draw()
         self.button_4.draw()
         self.player.draw()
-        if self.x == 1:
-            super().on_draw()
 
-    def add_dialogue_box(self):
-        color = (220, 228, 255)
-        dialoguebox = arcade.gui.DialogueBox(self.half_width, self.half_height, self.half_width*1.1, self.half_height*1.1, None, self.theme)
-        close_button = CloseButton(dialoguebox, self.half_width, self.half_height-(self.half_height/2) + 40,
-                                   theme=self.theme)
-        dialoguebox.button_list.append(close_button)
-        message = "Hello I am a Dialogue Box."
-        dialoguebox.text_list.append(arcade.gui.Text(message, self.half_width, self.half_height, self.theme.font_color))
-        self.dialogue_box_list.append(dialoguebox)
-
-    def add_text(self):
-        message = "Press this button to activate the Dialogue Box"
-        self.text_list.append(arcade.gui.Text(message, self.half_width-50, self.half_height))
-
-    def add_button(self):
-        show_button = ShowButton(self.dialogue_box_list[0], settings.WIDTH-100, self.half_height, theme=self.theme)
-        self.button_list.append(show_button)
-
-    def set_dialogue_box_texture(self):
-        dialogue_box = ":resources:gui_themes/Fantasy/DialogueBox/DialogueBox.png"
-        self.theme.add_dialogue_box_texture(dialogue_box)
-    
-    def set_button_texture(self):
-        normal = ":resources:gui_themes/Fantasy/Buttons/Normal.png"
-        hover = ":resources:gui_themes/Fantasy/Buttons/Hover.png"
-        clicked = ":resources:gui_themes/Fantasy/Buttons/Clicked.png"
-        locked = ":resources:gui_themes/Fantasy/Buttons/Locked.png"
-        self.theme.add_button_textures(normal, hover, clicked, locked)
-
-    def set_theme(self):
-        self.theme = arcade.gui.Theme()
-        self.set_dialogue_box_texture()
-        self.set_button_texture()
-        self.theme.set_font(24, arcade.color.WHITE)
 
     def update(self, delta_time):
         self.player.update()
 
+
+
     def on_mouse_press(self, x, y, button, modifiers):
-        if button == arcade.MOUSE_BUTTON_LEFT:
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            print(self.puzzle.give_puzzle())
+        elif button == arcade.MOUSE_BUTTON_LEFT:
             print(x, y)
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
@@ -186,37 +190,38 @@ class Ch3View(arcade.View):
             if (self.player.center_x  >= 290 and self.player.center_x <= 515) and (self.player.center_y >= 555):
                 self.x = 1
 
-            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 0:
-                self.button = settings.button_pressed
-                self.puzzle_action = 1
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
+                self.button_on(1)
+                self.puzzle.add_value(1)
+                
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1):
+                self.button_off(1)
+                self.puzzle.remove_value(1)
+                
+            elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False:
+                self.button_on(2)
+                self.puzzle.add_value(2)
+                
+            elif (self.player.left  >= 0 and self.player.center_x <= 120) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2):
+                self.button_off(2)
+                self.puzzle.remove_value(2)
+                
+            elif (self.player.center_x  >= 706) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
+                self.button_on(3)
+                self.puzzle.add_value(3)
 
-            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 540 and self.player.center_y <= 564 ) and self.puzzle_action == 1:
-                self.button = settings.button
-                self.puzzle_action = 0
-
-            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 0:
-                self.button = settings.button_pressed
-                self.puzzle_action = 1
-
-            elif (self.player.center_x  >= 30 and self.player.center_x <= 88) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 1:
-                self.button = settings.button
-                self.puzzle_action = 0
-            
-            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 0:
-                self.button = settings.button_pressed
-                self.puzzle_action = 1
-
-            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 540 and self.player.center_y <= 564) and self.puzzle_action == 1:
-                self.button = settings.button
-                self.puzzle_action = 0
-
-            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 0:
-                self.button = settings.button_pressed
-                self.puzzle_action = 1
-
-            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y >= 48 and self.player.center_y <= 88) and self.puzzle_action == 1:
-                self.button = settings.button
-                self.puzzle_action = 0
+            elif (self.player.center_x  >= 706) and (self.player.bottom >= 512) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
+                self.button_off(3)
+                self.puzzle.remove_value(3)
+                
+            elif (self.player.center_x  >= 706) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
+                self.button_on(4)
+                self.puzzle.add_value(4)
+        
+            elif (self.player.center_x  >= 706 and self.player.center_x <= 772) and (self.player.center_y <= 88) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
+                self.button_off(4)
+                self.puzzle.remove_value(4)
+                
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
@@ -226,15 +231,12 @@ class Ch3View(arcade.View):
         elif key == arcade.key.W or key == arcade.key.S:
             self.player.change_y = 0
 
-
            
 if __name__ == "__main__":
     """This section of code will allow you to run your View
     independently from the main.py file and its Director.
-
     You can ignore this whole section. Keep it at the bottom
     of your code.
-
     It is advised you do not modify it unless you really know
     what you are doing.
     """
@@ -243,7 +245,4 @@ if __name__ == "__main__":
     my_view = Ch3View()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
-    # music = arcade.Sound("End_of_Time.mp3")
-    # music.play()
     arcade.run()
-
