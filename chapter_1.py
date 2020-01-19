@@ -60,7 +60,7 @@ class Key(arcade.Sprite):
 
 
 class MyGame(arcade.View):
-    
+
     def __init__(self):
         super().__init__()
 
