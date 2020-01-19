@@ -1,54 +1,32 @@
 import arcade
 import random
-import settings
 from typing import List
 import math
 
 WIDTH = 800
 HEIGHT = 600
-view_merge = 100
 
 key_k = False
 key_k_used_time = 0
-
 end_window = False
-open_door = False
 end_window_time = 0
-
-_move_speed = 5
-
-TILE_SCALING = 1
+view_merge = 100
+move_speed = 10
 SPRITE_SCALING_PLAYER = 0.13
+TILE_SCALING = 1
 SPRITE_PIXEL_SIZE = 30
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
 
 class Key(arcade.Sprite):
-    """
-    create two types of key use classmethod.
-    Inheritance from arcade.Sprite to make each key a sprite
-    Attrs:
-    filename(str): the filename and path of the key
-    scale(int): the scale of the key
-    type (str): The type of the key
-
-    Return:
-        a key sprite with type that is either normal or special
-    """
-
-    # a sprite list of all keys
     all_keys = arcade.SpriteList()
+    id = None
     type = None
 
-    def __init__(self, filename: str, scale: int, type: str) -> None:
+    def __init__(self, filename, scale, type):
         super().__init__(filename, scale)
-        self._type = type
-
-    def get_type(self):
-        return self._type
-
-    def set_type(self, value):
-        self._type = value
+        self.id = len(self.all_keys)
+        self.type = type
 
     def add_key(self, key):
         self.all_keys.append(key)
@@ -63,48 +41,30 @@ class Key(arcade.Sprite):
         special_key = cls("images/key.png", TILE_SCALING, "special")
         return special_key
 
-
-class MyGame(arcade.View):
-    """
-    All the game function are created in this class
-    """
-
-    def __init__(self):
-        super().__init__()
+class MyGame(arcade.Window):
+    def __init__(self, width, height, title):
+        super().__init__(width, height, title)
 
         self.player_list = None
         self.wall_list = None
         self.key_list = None
+        self.background = None
         self.key = Key(None, TILE_SCALING, None)
         self.door = None
         self.score = None
+        self.bag = []
         self.player_sprite = None
         self.physics_engine = None
         self.view_bottom = 0
         self.view_left = 0
-        self.frime_count = 0
-        self.flag_k = None
-        self.introduction = True
         self.endWindow = None
-        self.background = None
+        self.frime_count = 0
         arcade.set_background_color(arcade.color.BLACK)
-        self.setup()
 
-    def key_place_success(self, key_placed_successfully: bool, normal_key: arcade.Sprite, x_list: List[int],
-                          y_list: List[int]):
-        """
-        Use recursion to check if key place is successful
-        Attrs:
-        key_placed_successfully(bool): break statement of the recursion function
-        normal_key(arcade.Sprite): a key Sprite
-        x_list: List[int]: all the x coordinates of the keys has been created
-        y_list: List[int]: all the y coordinates of the keys has been created
-
-        Return:
-           the position of the key (x, y)
-        """
+    # check if key place is successful
+    def key_place_success(self, key_placed_successfully, normal_key, x_list, y_list):
         if key_placed_successfully:
-            return normal_key.center_x, normal_key.center_y
+            return [normal_key.center_x, normal_key.center_y]
         normal_key.center_x = random.randrange(1500)
         normal_key.center_y = random.randrange(1500)
 
@@ -113,14 +73,12 @@ class MyGame(arcade.View):
 
         # See if the key is hitting another key
         key_hit_list = arcade.check_for_collision_with_list(normal_key, self.key_list)
-
-        # See if the key is too close from each other
         flag = True
         for item_x in x_list:
-            if abs(int(item_x - normal_key.center_x)) < 30:
+            if abs(item_x - normal_key.center_x) < 40:
                 flag = False
         for item_y in y_list:
-            if abs(int(item_y - normal_key.center_y)) < 20:
+            if abs(item_y - normal_key.center_y) < 25:
                 flag = False
         if len(wall_hit_list) == 0 and len(key_hit_list) == 0 and flag == True:
             key_placed_successfully = True
@@ -128,20 +86,20 @@ class MyGame(arcade.View):
         return self.key_place_success(key_placed_successfully, normal_key, x_list, y_list)
 
     def setup(self):
-        """
-        Create all sprites and sprite lists here
-        """
+        # Create your sprites and sprite lists here
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.key_list = arcade.SpriteList()
         self.background = arcade.SpriteList()
         self.door = arcade.SpriteList()
         self.frime_count = 0
-        self.flag_k = False
+
+        # Score
         self.score = 0
 
         # Set up the player
-        self.player_sprite = arcade.Sprite("images/Player.png", SPRITE_SCALING_PLAYER)
+        self.player_sprite = arcade.Sprite("images/Player.png",
+                                           SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
 
@@ -149,10 +107,13 @@ class MyGame(arcade.View):
 
         # Name of map file to load
         map_name = "maps/third-map.tmx"
-        # Name of the layer in the file
+        # Name of the layer in the file that has our platforms/walls
         platforms_layer_name = 'Platforms'
-        door_layer_name = "door"
+        # Name of the layer that has items for pick-up
+        door_layer_name = 'door'
+
         background_layer_name = "background"
+
         my_map = arcade.tilemap.read_tmx(map_name)
         # -- Platforms
         self.wall_list = arcade.tilemap.process_layer(my_map, platforms_layer_name, TILE_SCALING)
@@ -160,11 +121,12 @@ class MyGame(arcade.View):
         self.background = arcade.tilemap.process_layer(my_map, background_layer_name, TILE_SCALING)
         # -- door
         self.door = arcade.tilemap.process_layer(my_map, door_layer_name, TILE_SCALING)
+        # --- Other stuff
         # Set the background color
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
-        # Create the physics engine
+        # Create the 'physics engine'
         self.physics_engine = self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
 
         # Set  the viewport boundaries
@@ -173,102 +135,98 @@ class MyGame(arcade.View):
 
         # make a random value to represent the special key
         special_flag = int(random.randrange(0, 21))
+
+        # draw a list of keys
         x_list = []
         y_list = []
         for i in range(21):
-            # Create the key using key class and the recursion method
+            # Create the key using key class
             if i == special_flag:
                 new_key = self.key.creat_special_key()
             else:
                 new_key = self.key.create_normal_key()
+
             key_placed_successfully = False
             # keep trying until success
-            new_key.center_x, new_key.center_y = self.key_place_success(key_placed_successfully, new_key, x_list,
-                                                                        y_list)
-            # add each coordinates to the list
+            new_key.center_x, new_key.center_y = \
+                self.key_place_success(key_placed_successfully, new_key, x_list, y_list)
+
             x_list.append(new_key.center_x)
             y_list.append(new_key.center_y)
             self.key.add_key(new_key)
 
+        # Set  the viewport boundaries
+        self.view_left = 0
+        self.view_bottom = 0
+
     def on_draw(self):
-        """
-        Draw all the sprite and sprite in the setup function
-        """
-        arcade.start_render()
+        arcade.start_render()  # keep as first line
+        # Draw everything below here.
+        self.background.draw()
+        self.door.draw()
+        self.player_list.draw()
+        self.wall_list.draw()
+        self.key.all_keys.draw()
 
-        # draw the intro introduction
-        texture = arcade.load_texture("images/introduction.jpeg")
-        arcade.draw_texture_rectangle(WIDTH // 2, HEIGHT // 2, WIDTH, HEIGHT, texture)
+        output = f"keys:{self.score}"
+        arcade.draw_text(output, self.player_sprite.center_x - 20, self.player_sprite.center_y + 20, arcade.color.GOLD,
+                         14)
 
-        # check if the user press enter and setup the game
-        if not self.introduction:
-            self.background.draw()
-            self.door.draw()
-            self.player_list.draw()
-            self.wall_list.draw()
-            self.key.all_keys.draw()
+        if end_window:
+            self.flag = False
+            for i in self.key.all_keys:
+                if i.type == "special":
+                    self.flag = True
+            if not self.flag:
+                print("cleawr")
+                arcade.draw_rectangle_filled(self.view_left + WIDTH // 2, self.view_bottom + HEIGHT // 2, WIDTH, HEIGHT,
+                                             arcade.color.BLACK)
 
-            output = f"keys:{self.score}"
-            arcade.draw_text(output, self.player_sprite.center_x - 20, self.player_sprite.center_y + 20,
-                             arcade.color.GOLD,
-                             14)
+                arcade.draw_text(
+                    f"""!!! YOU WIN !!!
+\nthe final key you have is {self.score}
+                    
+                    """ , self.view_left + WIDTH //2, self.view_bottom + HEIGHT//2,
+                                 arcade.color.WHITE, font_size= 40, anchor_x="center", anchor_y="center")
 
-            # check of the player hit the door and press O to open
-            if end_window and open_door:
-                self.flag_k = False
-                # if the special key does not in our key list, the player win the game
-                for i in self.key.all_keys:
-                    if i._type == "special":
-                        self.flag_k = True
-                if not self.flag_k:
-                    texture = arcade.load_texture("images/ending.png")
-                    arcade.draw_texture_rectangle(self.view_left + WIDTH // 2, self.view_bottom + HEIGHT // 2, WIDTH,
-                                                  HEIGHT, texture)
+            else:
+                arcade.draw_rectangle_filled(self.view_left + WIDTH // 2, self.view_bottom + HEIGHT //2, 500, 100,
+                                             arcade.color.BLACK)
+                arcade.draw_text("FIND THE SPECIAL KEY",self.view_left + WIDTH // 2, self.view_bottom + HEIGHT // 2,
+                                 arcade.color.WHITE, font_size=30, anchor_x="center", anchor_y="center")
 
-                    arcade.draw_text(f"YOUR FINAL SCORE IS: {self.score * 100}", self.view_left + WIDTH // 2,
-                                     self.view_bottom + HEIGHT // 2 - 100,
-                                     arcade.color.WHITE, font_size=20, anchor_x="center", anchor_y="center")
 
-                # if the special key still in the key list, show text remind player
-                else:
-                    arcade.draw_text("FIND THE SPECIAL KEY", self.view_left + WIDTH // 2,
-                                     self.view_bottom + HEIGHT // 2,
-                                     arcade.color.WHITE, font_size=30, anchor_x="center", anchor_y="center")
 
     def update(self, delta_time):
         """
         All the logic to move, and the game logic goes here.
+        Normally, you'll call update() on the sprite lists that
+        need it.
         """
-        global end_window, end_window_time, key_k, key_k_used_time, open_door
-        # kill every key has been collect
+        global end_window, end_window_time, key_k, key_k_used_time
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.key.all_keys)
         for key in hit_list:
-            # count the number of time player use K to get the closest key
             if key == self.key.all_keys[0]:
                 key_k_used_time += 1
                 key_k = False
             key.remove_from_sprite_lists()
             self.score += 1
 
-        # check if the player hit the door
         if len(arcade.check_for_collision_with_list(self.player_sprite, self.door)) == 1:
             end_window = True
             end_window_time = self.frime_count
-
-        # Show the text: 3 seconds
-        if self.flag_k:
-            if self.frime_count - end_window_time == 180 and end_window:
+        if not self.flag:
+            if self.frime_count - end_window_time == 300 and end_window:
                 end_window = False
-                open_door = False
 
-        # update the physics engine
         self.physics_engine.update()
 
         # get the closest key
         if key_k and key_k_used_time < 1:
-            steps = int(arcade.get_distance_between_sprites(self.player_sprite, self.key.all_keys[0]))
-            x_delta = 6 * ((self.key.all_keys[0].center_x - self.player_sprite.center_x) / steps)
-            y_delta = 6 * ((self.key.all_keys[0].center_y - self.player_sprite.center_y) / steps)
+
+            steps= int(arcade.get_distance_between_sprites(self.player_sprite, self.key.all_keys[0]))
+            x_delta= 6*((self.key.all_keys[0].center_x - self.player_sprite.center_x)/steps)
+            y_delta= 6*((self.key.all_keys[0].center_y - self.player_sprite.center_y)/steps)
             self.key.all_keys[0].center_x = self.key.all_keys[0].center_x - x_delta
             self.key.all_keys[0].center_y = self.key.all_keys[0].center_y - y_delta
 
@@ -312,41 +270,29 @@ class MyGame(arcade.View):
     def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
+        For a full list of keys, see:
+        http://arcade.academy/arcade.key.html
         """
-        global key_k, key_k_used_time, open_door
+        global key_k, key_k_used_time
 
         if key == arcade.key.W:
-            self.player_sprite.change_y = _move_speed
+            self.player_sprite.change_y = move_speed
         elif key == arcade.key.S:
-            self.player_sprite.change_y = - _move_speed
+            self.player_sprite.change_y = - move_speed
         elif key == arcade.key.A:
-            self.player_sprite.change_x = - _move_speed
+            self.player_sprite.change_x = - move_speed
         elif key == arcade.key.D:
-            self.player_sprite.change_x = _move_speed
-        elif key == arcade.key.ENTER:
-            self.introduction = False
-        elif key == arcade.key.ESCAPE:
-            # arcade.close_window()
-            self.director.next_view()
+            self.player_sprite.change_x = move_speed
 
-        elif key == arcade.key.K:
+        if key == arcade.key.K:
             key_k = True
-            # start sort the distances
-            self.sort_key(self.key.all_keys)
-
-        elif key == arcade.key.O:
-            open_door = True
+            # key_k_used_time += 1
+            self.sort_key()
+            # self.skill()
 
     # sort the distances between each key and the player
-    def sort_key(self, key_list):
-        """
-        sort all the keys in the list by distances.
-        Sort the distance from the closest to the furthest
-        Args:
-            key_list: A list of key sprites
-        Returns:
-            a sorted sprite list
-        """
+    def sort_key(self):
+        key_list = self.key.all_keys
         for i in range(len(key_list)):
             for j in range(len(key_list) - 1):
                 new_sprite = arcade.SpriteList()
@@ -372,6 +318,18 @@ class MyGame(arcade.View):
         self.key.all_keys = key_list
         return key_list
 
+    # def skill(self):
+    #     self.sort_key()
+    #     # self.key.all_keys.kill()
+    #     steps= int(arcade.get_distance_between_sprites(self.player_sprite, self.key.all_keys[0]))
+    #     x_delta= (self.key.all_keys[0].center_x - self.player_sprite.center_x)/steps
+    #     y_delta= (self.key.all_keys[0].center_y - self.player_sprite.center_y)/steps
+    #     for i in range(steps):
+    #         self.key.all_keys[0].center_x = self.key.all_keys[0].center_x - 1
+    #         self.key.all_keys[0].center_y = self.key.all_keys[0].center_y - 1
+    #     # self.key.all_keys[0].change_y = y_delta
+    #     # self.key.all_keys[0].change_x = x_delta
+
     def on_key_release(self, key, key_modifiers):
         """
         Called whenever the user lets off a previously pressed key.
@@ -384,6 +342,7 @@ class MyGame(arcade.View):
 
         # elif key == arcade.key.K:
         #     key_k = False
+
 
     def on_mouse_motion(self, x, y, delta_x, delta_y):
         """
@@ -404,22 +363,11 @@ class MyGame(arcade.View):
         pass
 
 
-if __name__ == "__main__":
-    """This section of code will allow you to run your View
-    independently from the main.py file and its Director.
-
-    You can ignore this whole section. Keep it at the bottom
-    of your code.
-
-    It is advised you do not modify it unless you really know
-    what you are doing.
-    """
-
-    from utils import FakeDirector
-
-    window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = MyGame()
-
-    my_view.director = FakeDirector(close_on_next_view=True)
-    window.show_view(my_view)
+def main():
+    game = MyGame(WIDTH, HEIGHT, "My Game")
+    game.setup()
     arcade.run()
+
+
+if __name__ == "__main__":
+    main()
