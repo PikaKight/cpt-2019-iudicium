@@ -15,7 +15,7 @@ end_window = False
 open_door = False
 end_window_time = 0
 
-_move_speed = 15
+_move_speed = 5
 
 TILE_SCALING = 1
 SPRITE_SCALING_PLAYER = 0.15
