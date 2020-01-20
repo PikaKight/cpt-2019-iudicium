@@ -270,7 +270,10 @@ class Ch3View(arcade.View):
         self.riddle = Riddle("Sprites\DialogueBox.png", 1, 0, 0, 0, 0, settings.WIDTH / 2, settings.HEIGHT / 2 - 100)
         self.star_sprites = arcade.SpriteList()
         self.x = 0
-        self.star = 0
+        self.star_1 = 0
+        self.star_2 = 0
+        self.star_3 = 0
+        self.star_4 = 0
         self.score = 0
 
     def button_on(self, value: int):
@@ -310,12 +313,14 @@ class Ch3View(arcade.View):
             self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
    
     def star_sprite(self):
+        """ Creates a Sprite list of the star sprite when called
+        """
         for _ in range(5):
             star = arcade.Sprite("Sprites\star.png", .8)
             star.center_x = random.randrange(0, settings.WIDTH)
             star.center_y = random.randrange(0,settings.HEIGHT)
             self.star_sprites.append(star)
-
+        
     def on_show(self):
         self.button_off(1)
         self.button_off(2)
@@ -426,8 +431,8 @@ class Ch3View(arcade.View):
 
             elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
                 self.button_on(1)
-                self.star += 1
-                if self.star == 1:
+                self.star_1 += 1
+                if self.star_1 == 1:
                     self.star_sprite()
                 self.puzzle.add_value(1)
                 
@@ -437,6 +442,9 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False:
                 self.button_on(2)
+                self.star_2 += 1
+                if self.star_2 == 1:
+                    self.star_sprite()
                 self.puzzle.add_value(2)
                 
             elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2):
@@ -445,6 +453,9 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
                 self.button_on(3)
+                self.star_3 += 1
+                if self.star_4 == 1:
+                    self.star_sprite()
                 self.puzzle.add_value(3)
 
             elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
@@ -453,6 +464,9 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
                 self.button_on(4)
+                self.star_4 += 1
+                if self.star_4 == 1:
+                    self.star_sprite()
                 self.puzzle.add_value(4)
         
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
@@ -506,8 +520,13 @@ class Scoreboard(arcade.View):
             game = json.load(f)
 
         start = 0
-        end = len(game["Date"]) - 1
-    
+        end = len(game) - 1
+
+        
+
+        while start <= end:
+            mid = (start+ end) // 2
+            if game[mid] 
     def on_draw(self):
         arcade.start_render()
         
