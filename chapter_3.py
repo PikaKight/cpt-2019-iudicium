@@ -106,8 +106,9 @@ class Puzzle:
         Arg:
             value is the order number for the buttons 
         """
-        self._puzzle.remove(value)
-
+        for i, num in enumerate(self._puzzle):
+            if num is value:
+                return self._puzzle.pop(i)
 
     def give_puzzle(self):
         """ gives the list that is self._puzzle
@@ -460,7 +461,6 @@ class Ch3View(arcade.View):
                 self.button_off(4)
                 self.puzzle.remove_value(4)
                 
-
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
         if key == arcade.key.A or key == arcade.key.D:
@@ -521,7 +521,7 @@ class Scoreboard(arcade.View):
         self.new_game = self.sort_scores(self.game)
     
     def sort_scores(self, data: list):
-        
+        pass
 
     def on_draw(self):
         arcade.start_render()
@@ -558,9 +558,9 @@ if __name__ == "__main__":
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
     # my_view = ch3_MenuView()
     # my_view = Instructions()
-    # my_view = Ch3View()
+    my_view = Ch3View()
     # my_view = WinView()
-    my_view = Scoreboard()
+    # my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
