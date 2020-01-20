@@ -438,12 +438,6 @@ class Scoreboard(arcade.View):
         self.menu.center_y = settings.HEIGHT/2
 
         self.sorted_times_list = None
-        
-        self.first = None
-        self.second = None
-        self.third = None
-        self.fourth = None
-        self.fifth = None
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -480,8 +474,23 @@ class Scoreboard(arcade.View):
                             arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
             n += 1
             l -= 18
+
             if n == 5:
                 break
+        
+        # Search through game stats list for first place game stats
+        with open("chapter_4_scores.json") as json_file:
+            data = json.load(json_file)
+        game_stats = data["game_stats"]
+
+        for i in game_stats:
+            if i["Total Time"] == self.sorted_times_list[0]:
+                arcade.draw_text(f"""       First Place Game Stats:
+
+            Total Damage Recieved: {i["Total Damage"]}
+            Total Lasers Used: {i["Total Lasers Used"]}""",
+                                self.menu.center_x, self.menu.center_y, arcade.color.BLACK, font_size=15,
+                                anchor_x="center", anchor_y="center")
 
         arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
