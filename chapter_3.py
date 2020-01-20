@@ -273,7 +273,6 @@ class Ch3View(arcade.View):
         self.star_1 = 0
         self.star_2 = 0
         self.star_3 = 0
-        self.star_4 = 0
         self.score = 0
 
     def button_on(self, value: int):
@@ -464,9 +463,6 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
                 self.button_on(4)
-                self.star_4 += 1
-                if self.star_4 == 1:
-                    self.star_sprite()
                 self.puzzle.add_value(4)
         
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
@@ -524,9 +520,6 @@ class Scoreboard(arcade.View):
 
         
 
-        while start <= end:
-            mid = (start+ end) // 2
-            if game[mid] 
     def on_draw(self):
         arcade.start_render()
         
