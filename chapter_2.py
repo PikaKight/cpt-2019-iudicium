@@ -58,20 +58,22 @@ class Player(arcade.Sprite):
 
     # Create a direction not when the player hit a button
     @classmethod
-    def create_direction(cls, button_hit_time: int):
-        if button_hit_time == 1 or button_hit_time == 4:
-            return arcade.draw_text("Go Down", my_view.player.center_x - 30, my_view.player.center_y + 70,
+    def create_direction(cls, button_hit_time: int, center_x: float, center_y: float):
+        if button_hit_time == 1:
+            return arcade.draw_text("Go Down", center_x - 30, center_y + 70,
                                     arcade.csscolor.RED, 15)
         if button_hit_time == 2:
-            return arcade.draw_text("Go Right", my_view.player.center_x - 30, my_view.player.center_y + 70,
+            return arcade.draw_text("Go Right", center_x - 30, center_y + 70,
                                     arcade.csscolor.RED, 15)
         if button_hit_time == 3:
-            return arcade.draw_text("Go Left", my_view.player.center_x - 30, my_view.player.center_y + 70,
+            return arcade.draw_text("Go Left", center_x - 30, center_y + 70,
                                     arcade.csscolor.RED, 15)
+        if button_hit_time == 4:
+            return arcade.draw_text("Go Down", center_x - 30, center_y + 70,
+                                    arcade.csscolor.RED)
 
     def __init__(self, filename=None, scale=0.3, center_x=760, center_y=128):
         super().__init__(filename=filename, scale=scale, center_x=center_x, center_y=center_y)
-
         self._Player_move_speed = 3
         self._Player_jump_speed = 3
         self._view_bottom = 0
@@ -320,7 +322,7 @@ class Chapter2View(arcade.View):
 
         # The direction not showing time
         if (self.get_total_time() - self.get_button_press_time()) < 5:
-            self.player.create_direction(self.get_button_hit_time())
+            self.player.create_direction(self.get_button_hit_time(), self.player.center_x, self.player.center_y)
 
     def update(self, delta_time: float):
         self.player.check_bag()
@@ -399,6 +401,10 @@ class Chapter2View(arcade.View):
         if key == arcade.key.LEFT:
             self.left_pressed = False
             self.player.change_x = 0
+
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        print(x)
+        print(y)
 
 
 if __name__ == "__main__":
