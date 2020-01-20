@@ -1,4 +1,4 @@
-import arcade, settings
+import arcade, settings, random, json
 
 from typing import List
 
@@ -117,8 +117,11 @@ class Puzzle:
         return self._puzzle
 
 
-    def value_checker(self, puzzle: List[], value):
-        """
+    def value_checker(self, puzzle: List[int], value: int):
+        """ Checks whether or not a button is pressed and their order number is recorded
+        Arg:
+            puzzle: the list that contains the order of the buttons that are currently pressed
+            value: the button that is being checked 
         """
         if len(puzzle) == 0:
             return False
@@ -138,13 +141,15 @@ class Puzzle:
     
 
     def checker(self):
+        """ Checks if the puzzle is solved and the buttons are all pressed in the right order
+        """
         if self._puzzle == Puzzle.solution:
             return True
 
 class ch3_MenuView(arcade.View):
     def __init__(self):
         super().__init__()
-        self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
+        self.background = arcade.load_texture("Sprites/abstract-technology-particle-background_52683-25766.jpg")
 
     def on_show(self):
         pass
@@ -157,8 +162,10 @@ class ch3_MenuView(arcade.View):
 
         arcade.draw_text("Chapter 3", settings.WIDTH/2, settings.HEIGHT/2 + 50, arcade.color.WHITE,
                         font_size=45, bold=True, anchor_x="center")
+
         arcade.draw_text("Press ENTER to proceed to Game", settings.WIDTH/2, settings.HEIGHT/2,
                         arcade.color.WHITE, font_size=20, anchor_x="center")
+
         arcade.draw_text("Press ESC to Exit Game", settings.WIDTH/2, settings.HEIGHT/2 - 50,
                         arcade.color.WHITE, font_size=20, anchor_x="center")
     
@@ -166,6 +173,7 @@ class ch3_MenuView(arcade.View):
         if key == arcade.key.ENTER:
             instructions_View = Instructions()
             self.window.show_view(instructions_View)
+
         elif key == arcade.key.ESCAPE:
             arcade.close_window()
             self.director.next_view()
@@ -174,14 +182,19 @@ class Instructions(arcade.View):
     def __init__(self):
         super().__init__()
 
-        self.background = arcade.load_texture("Sprites/blackBackground.jpg")
+        self.background = arcade.load_texture("Sprites/abstract-technology-particle-background_52683-25766.jpg")
 
         self.button = arcade.Sprite("Sprites\switchGreen.png", 0.6)
         self.button.center_x = settings.WIDTH/2 - 70
         self.button.center_y = 200
+
         self.button_pressed = arcade.Sprite("Sprites\switchGreen_pressed.png", 0.6)
         self.button_pressed.center_x = settings.WIDTH/2 + 70
-        self.button_pressed.center_y = 190
+        self.button_pressed.center_y = 200
+
+        self.star = arcade.Sprite("Sprites\star.png", 1)
+        self.star.center_x = settings.WIDTH/2 - 100
+        self.star.center_y = settings.HEIGHT / 2
     
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
@@ -191,23 +204,38 @@ class Instructions(arcade.View):
 
         arcade.draw_texture_rectangle(settings.WIDTH/2, settings.HEIGHT/2,
                                         settings.WIDTH, settings.HEIGHT, self.background)
-        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT/2 + 150, arcade.color.WHITE,
+        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT - 100, arcade.color.WHITE,
                         font_size=30, bold=True, anchor_x="center", anchor_y="center")
-        arcade.draw_text("""    Use W A S D keys to move around. 
-    Space to turn the buttons on and off.
+
+        arcade.draw_text("""
+        
+        W: UP
+        S: DOWN
+        A: LEFT
+        D: RIGHT
+                        """, 0, settings.HEIGHT/2, arcade.color.WHITE,
+                        font_size=30, bold=True)
+
+
+        arcade.draw_text("""
 
     Press the buttons in a certain order to unlock the next chapter.
 
     For the riddle move up towards the brown sign and press space.
 
-    Press ENTER to 
-
+    Press ENTER to Continue
     """,
-                        settings.WIDTH/2, settings.HEIGHT/2 + 40, arcade.color.WHITE,
+                        settings.WIDTH/2 + 100, settings.HEIGHT/2 + 100, arcade.color.WHITE,
                         font_size=15, anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("""Stars are worth 1 pt and will spawn 
+                            when the first correct button is pressed
+                        """,settings.WIDTH/2 + 100, settings.HEIGHT/2, arcade.color.WHITE,
+                        font_size=20, anchor_x="center", anchor_y="center")  
         
         self.button.draw()
         self.button_pressed.draw()
+        self.star.draw()
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
@@ -217,92 +245,17 @@ class Instructions(arcade.View):
             arcade.close_window()
             self.director.next_view()
 
-class ShowButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Show", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if not self.dialoguebox.active:
-            self.pressed = True
-
-    def on_release(self):
-        if self.pressed:
-            self.pressed = False
-            self.dialoguebox.active = True
-
-class CloseButton(arcade.gui.TextButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close", theme=None):
-        super().__init__(x, y, width, height, text, theme=theme)
-        self.dialoguebox = dialoguebox
-
-    def on_press(self):
-        if self.dialoguebox.active:
-            self.pressed = True
-
-
-    def on_release(self):
-        if self.pressed and self.dialoguebox.active:
-            self.pressed = False
-            self.dialoguebox.active = False
-
-class Riddle(arcade.View):
-    def __init__(self):
-        super().__init__()
-        self.half_width = settings.WIDTH/2
-        self.half_height = settings.HEIGHT/2
-        self.theme = None
-
-    def add_dialogue_box(self):
-        color = (220, 228, 255)
-        dialoguebox = arcade.gui.DialogueBox(self.half_width, self.half_height, self.half_width*1.1,
-                                             self.half_height*1.5, color, self.theme)
-        close_button = CloseButton(dialoguebox, self.half_width, self.half_height-(self.half_height/2) + 40,
-                                   theme=self.theme)
-        dialoguebox.button_list.append(close_button)
-        message = "Hello I am a Dialogue Box."
-        dialoguebox.text_list.append(arcade.gui.Text(message, self.half_width, self.half_height, self.theme.font_color))
-        self.dialogue_box_list.append(dialoguebox)
-
-    def add_text(self):
-        message = "Press this button to activate the Dialogue Box"
-        self.text_list.append(arcade.gui.Text(message, self.half_width-50, self.half_height))
-
-    def add_button(self):
-        show_button = ShowButton(self.dialogue_box_list[0], settings.WIDTH-100, self.half_height, theme=self.theme)
-        self.button_list.append(show_button)
-
-    def set_dialogue_box_texture(self):
-        dialogue_box = "Sprites\DialogueBox (1).png"
-        self.theme.add_dialogue_box_texture(dialogue_box)
-
-    def set_button_texture(self):
-        normal = "Sprites/Normal.png"
-        hover = "Sprites\Hover.png"
-        clicked = "Sprites\Clicked.png"
-        locked = "Sprites\Locked.png"
-        self.theme.add_button_textures(normal, hover, clicked, locked)
-
-    def set_theme(self):
-        self.theme = arcade.gui.Theme()
-        self.set_dialogue_box_texture()
-        self.set_button_texture()
-        self.theme.set_font(24, arcade.color.WHITE)
-
-    def setup(self):
-        arcade.set_background_color(arcade.color.ALICE_BLUE)
-        self.set_theme()
-        self.add_dialogue_box()
-        self.add_text()
-        self.add_button()
+class Riddle(arcade.Sprite):
+    def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
+        super().__init__(filename=filename, scale=scale, image_x=image_x, image_y=image_y, image_width=image_width, image_height=image_height, center_x=center_x, center_y=center_y, repeat_count_x=repeat_count_x, repeat_count_y=repeat_count_y)
 
     def on_draw(self):
         arcade.start_render()
-        super().on_draw()
-
-    def on_update(self, delta_time):
-        if self.dialogue_box_list[0].active:
-            return
+        super().draw()
+        arcade.draw_text("INSTRUCTIONS", settings.WIDTH/2, settings.HEIGHT - 100, arcade.color.WHITE,
+                        font_size=30, bold=True)  
+    def update(self, delta_time):
+        self.update()
 
 class Ch3View(arcade.View):
     def __init__(self):
@@ -314,7 +267,11 @@ class Ch3View(arcade.View):
         self.player = Player("Sprites/alienBlue_front.png", .4, 0, 0, 0, 0, 400, 300)
         self.text_sprite = arcade.Sprite("Sprites\Brown.png", .5, 0 ,0, 0, 0, 400, 590)
         self.background = arcade.load_texture("Sprites/brown-stone-seamless-background-vector-illustration-game-texture-68967465.jpg")
-
+        self.riddle = Riddle("Sprites\DialogueBox.png", 1, 0, 0, 0, 0, settings.WIDTH / 2, settings.HEIGHT / 2 - 100)
+        self.star_sprites = arcade.SpriteList()
+        self.x = 0
+        self.star = 0
+        self.score = 0
 
     def button_on(self, value: int):
         """ creates the different on button sprites for the give value
@@ -351,6 +308,13 @@ class Ch3View(arcade.View):
             self.button_3 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 570)
         elif value is 4:    
             self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
+   
+    def star_sprite(self):
+        for _ in range(5):
+            star = arcade.Sprite("Sprites\star.png", .8)
+            star.center_x = random.randrange(0, settings.WIDTH)
+            star.center_y = random.randrange(0,settings.HEIGHT)
+            self.star_sprites.append(star)
 
     def on_show(self):
         self.button_off(1)
@@ -375,6 +339,18 @@ class Ch3View(arcade.View):
         self.button_3.draw()
         self.button_4.draw()
         self.player.draw()
+        self.star_sprites.draw()
+        if self.x % 2 == 1:
+            self.riddle.draw()
+            arcade.draw_text("""
+            The corner walls will lead your way. 
+            Read it like a book and you should see.
+            To the second, tan inverses (800/600). 
+            Then across you're below the start,
+            Head N 37 degres E.   
+            The path will open once you succeed!""", self.half_width - 350, self.half_height - 200,  arcade.color.WHITE, 20, 600,
+                            "center", "arial", True)
+            
         # Calculate minutes
         minutes = int(self.total_time) // 60
 
@@ -390,10 +366,28 @@ class Ch3View(arcade.View):
 
     def update(self, delta_time):
         self.player.update()
+
         self.total_time += delta_time
+
+        for star in self.star_sprites:
+            player_in_contact = star.collides_with_sprite(self.player)
+            if player_in_contact:
+                star.kill()
+                self.score += 1
+
         if self.puzzle.checker() is True:
+            with open ("Chapter_3_score.json", 'r') as f:
+                game = json.load(f)
+
+            final_score = {f"{self.total_time}": f"Final Star Score: {self.score}"} 
+            game["Data"].append(final_score)
+
+            with open ("Chapter_3_score.json", 'w') as f:
+                json.dump(game, f)
+
             winView = WinView()
             self.window.show_view(winView)
+        
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_RIGHT:
@@ -419,11 +413,14 @@ class Ch3View(arcade.View):
         
         elif key == arcade.key.SPACE:
             
-            if (self.player.center_x  >= 290 and self.player.center_x <= 515) and (self.player.center_y >= 555):
-                pass
+            if (self.player.center_x  >= 290 and self.player.center_x <= 515) and (self.player.top >= 555):
+                self.x += 1
 
             elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
                 self.button_on(1)
+                self.star += 1
+                if self.star == 1:
+                    self.star_sprite()
                 self.puzzle.add_value(1)
                 
             elif (self.player.left  >= 0 and self.player.right <= 120) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1):
@@ -483,14 +480,39 @@ class WinView(arcade.View):
         if key == arcade.key.ENTER:
             scoreboard_View = Scoreboard()
             self.window.show_view(scoreboard_View)
+
         elif key == arcade.key.ESCAPE:
             self.director.next_view()
 
 class Scoreboard(arcade.View):
     def __init__(self):
         super().__init__()
-
+        self.scoreboard = arcade.Sprite("Sprites/Menu.png", 0.8, 0, 0, 0, 0, settings.WIDTH/2, settings.HEIGHT/2 )
+        self.background = arcade.load_texture("Sprites/fancy_silhouette.png")
+    
+    def on_draw(self):
+        arcade.start_render()
         
+        arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
+        
+        self.scoreboard.draw()
+
+        arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
+                        font_size=30, bold=True, anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("    Top 5 Players:", self.menu.center_x, self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
+                        anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("Press ENTER to CONTINUE", self.menu.center_x, self.menu.center_y - 220,
+                        arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
+    
+    def update(self, delta_time):
+        pass
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            self.director.next_view()   
+
 if __name__ == "__main__":
     """This section of code will allow you to run your View
     independently from the main.py file and its Director.
@@ -502,6 +524,7 @@ if __name__ == "__main__":
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
     # my_view = ch3_MenuView()
+    # my_view = Instructions()
     my_view = Ch3View()
     # my_view = WinView()
     my_view.director = FakeDirector(close_on_next_view=True)
