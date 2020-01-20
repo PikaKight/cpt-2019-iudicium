@@ -491,11 +491,17 @@ class WinView(arcade.View):
         with open ("Chapter_3_score.json", 'r') as f:
             game = json.load(f)
 
+        for key in game[len(game) - 1].keys():
+            time = key
         arcade.draw_text(f"""
-                      You've Complete Chapter 3!
-                     {game[len(game) - 1]}
-                        """, settings.WIDTH/2 - 125, settings.HEIGHT/2,
+                    You've Complete Chapter 3!
+                            
+                            Total Time: {key} 
+                            
+                            {game[len(game) -1 ][key]}
+                        """, settings.WIDTH/2 - 125, settings.HEIGHT/2 - 50,
                         arcade.color.BLACK, font_size=35, anchor_x="center")
+
         arcade.draw_text("""
                             Press ENTER to see Scoreboard
                         
