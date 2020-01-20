@@ -6,13 +6,18 @@ import settings
 class MenuView(arcade.View):
     def __init__(self):
         super().__init__()
-    def on_show(self):
-        arcade.set_background_color(arcade.color.WHITE)
+        self.half_height = settings.HEIGHT / 2
+        self.half_width = settings.WIDTH / 2
+        self.background = arcade.load_texture("Sprites\Iudicium.jpg")
+        
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("Menu", settings.WIDTH/2, settings.HEIGHT/2,
-                         arcade.color.BLACK, font_size=30, anchor_x="center")
+        arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
+        arcade.draw_text("IUDICIUM", settings.WIDTH/2, settings.HEIGHT/2 + 100,
+                         arcade.color.CRIMSON, font_size=60, anchor_x="center")
+        arcade.draw_text("Press Any Key to START", settings.WIDTH/2, settings.HEIGHT/2 - 100,
+                         arcade.color.CRIMSON, font_size=60, anchor_x="center")           
 
     def on_key_press(self, key, modifiers):
         self.director.next_view()
