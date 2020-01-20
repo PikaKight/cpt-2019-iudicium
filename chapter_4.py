@@ -271,9 +271,13 @@ class gameView(arcade.View):
         
         # All slimes defeated
         if len(self.slime_list) == 0:
-            data = {"game_stats": []}
-            game_stats = {f"{self.total_time}": {"Total Damage Taken": self.total_damage, "Total Lasers Used":self.total_lasers}}
+            with open("chapter_4_scores.json") as json_file:
+                data = json.load(json_file)
+
+            # data = {"game_stats": []}
+            game_stats = {f"{round(self.total_time, 2)}": {"Total Damage Taken": self.total_damage, "Total Lasers Used":self.total_lasers}}
             data["game_stats"].append(game_stats)
+
             with open("chapter_4_scores.json", "w") as f:
                 json.dump(data, f)
 
@@ -439,7 +443,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = ch4_MenuView()
+    my_view = gameView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
