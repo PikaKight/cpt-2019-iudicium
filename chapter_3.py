@@ -392,7 +392,7 @@ class Ch3View(arcade.View):
             output = f"{minutes:02d}:{seconds:02d}"
 
             final_score = {f"{output}": f"Final Star Score: {self.score}"} 
-            game.append(final_score)
+            game[output] = final_score
 
             with open ("Chapter_3_score.json", 'w') as f:
                 json.dump(game, f)
@@ -401,16 +401,7 @@ class Ch3View(arcade.View):
             self.window.show_view(winView)
         
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        if button == arcade.MOUSE_BUTTON_RIGHT:
-            print(self.puzzle.give_puzzle())
-        elif button == arcade.MOUSE_BUTTON_LEFT:
-            print(x, y)
-
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.ESCAPE:
-            self.director.next_view()
-
         if key == arcade.key.W:
             self.player.change_y = speed
 
@@ -524,15 +515,12 @@ class Scoreboard(arcade.View):
         self.half_width = settings.WIDTH / 2
         self.scoreboard = arcade.Sprite("Sprites/Menu.png", 0.8, 0, 0, 0, 0, settings.WIDTH/2, settings.HEIGHT/2 )
         self.background = arcade.load_texture("Sprites/fancy_silhouette.png")
-        self.sort_scores()
-    
-    def sort_scores(self):
         with open("Chapter_3_score.json", 'r') as f:
-            game = json.load(f)
+            self.game = json.load(f)
 
-        start = 0
-        end = len(game) - 1
-
+        self.new_game = self.sort_scores(self.game)
+    
+    def sort_scores(self, data: list):
         
 
     def on_draw(self):
@@ -571,7 +559,8 @@ if __name__ == "__main__":
     # my_view = ch3_MenuView()
     # my_view = Instructions()
     # my_view = Ch3View()
-    my_view = WinView()
+    # my_view = WinView()
+    my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
