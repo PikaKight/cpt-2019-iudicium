@@ -9,7 +9,7 @@ import json
 from typing import List
 
 # the player's speed
-speed = 7
+speed = 10
 
 
 class Player(arcade.Sprite):
@@ -580,7 +580,7 @@ class WinView(arcade.View):
                                       settings.WIDTH, settings.HEIGHT,
                                       self.background)
 
-        with ope("Chapter_3_score.json", 'r') as f:
+        with open("Chapter_3_score.json", 'r') as f:
             game = json.load(f)
 
         for key, value in game.items():
@@ -681,25 +681,16 @@ class Scoreboard(arcade.View):
         placement = 1
         h = 150  # Controls the Height of the text
         # Checks if there are more than five scores in the json file
-        if len(game) > 5:
             # loops through the dictionary for the first 5 scores
             # and places it on the screen
-            while placement < 5:
-                for key, value in game.items():
-                    arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}",
-                                     -100, self.half_height + h,
-                                     arcade.color.BLACK, 15, 1000, "center",
-                                     'arial', True)
-                    placement += 1
-                    h -= 50  # Change in Height
-        else:
-            # loops through the dictionary and places it on the screen
+        while placement < 5:
             for key, value in game.items():
                 arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}",
-                                 -100, self.half_height + h, arcade.color.BLACK,
-                                 15, 1000, "center", 'arial', True)
+                                -100, self.half_height + h,
+                                arcade.color.BLACK, 15, 1000, "center",
+                                'arial', True)
                 placement += 1
-                h -= 50
+                h -= 50  # Change in Height
 
         arcade.draw_text("Press ENTER to CONTINUE", self.scoreboard.center_x,
                          self.scoreboard.center_y - 220,
@@ -723,11 +714,11 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = ch3_MenuView()
+    # my_view = ch3_MenuView()
     # my_view = Instructions()
     # my_view = Ch3View()
     # my_view = WinView()
-    # my_view = Scoreboard()
+    my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
