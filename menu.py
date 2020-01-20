@@ -8,7 +8,7 @@ class MenuView(arcade.View):
         super().__init__()
         self.half_height = settings.HEIGHT / 2
         self.half_width = settings.WIDTH / 2
-        self.background = arcade.load_texture("Sprites\Iudicium.jpg")
+        self.background = arcade.load_texture("Sprites/Iudicium.jpg")
         
 
     def on_draw(self):
