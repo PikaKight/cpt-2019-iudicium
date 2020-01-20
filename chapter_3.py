@@ -518,10 +518,21 @@ class Scoreboard(arcade.View):
         with open("Chapter_3_score.json", 'r') as f:
             self.game = json.load(f)
 
-        self.new_game = self.sort_scores(self.game)
+        self.new_game = self.sort_scores()
     
-    def sort_scores(self, data: list):
-        pass
+    def order(x, y):
+        if x[1] < y[1]:
+            return x, y
+        else: 
+            return y, x
+
+    def sort_scores(self):
+        d_items = self.game.items()
+        for j in range(len(d_items) - 1):
+            for i in range(len(d_items) - 1):
+                d_items[i], d_items[j+1] = self.order(d_items[i], d_items[j+1])
+            
+            return d_items   
 
     def on_draw(self):
         arcade.start_render()
@@ -558,9 +569,9 @@ if __name__ == "__main__":
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
     # my_view = ch3_MenuView()
     # my_view = Instructions()
-    my_view = Ch3View()
+    # my_view = Ch3View()
     # my_view = WinView()
-    # my_view = Scoreboard()
+    my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
