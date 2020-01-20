@@ -45,83 +45,83 @@ class Player(arcade.Sprite):
             self.top = settings.HEIGHT
 
         # boundary of wall left up
-        if self.right > 185 and self.left < 180 and self.top > 338 and
-        self.bottom < 464:
+        if (self.right > 185 and self.left < 180 and self.top > 338 and
+            self.bottom < 464):
             self.right = 184
-        if self.left < 212 and self.left > 190 and self.bottom < 435 and
-        self.top > 338:
+        if (self.left < 212 and self.left > 190 and self.bottom < 435 and
+            self.top > 338):
             self.left = 212
-        if self.right > 185 and self.left < 312 and self.bottom < 464 and
-        self.top > 460:
+        if (self.right > 185 and self.left < 312 and self.bottom < 464 and
+            self.top > 460):
             self.bottom = 464
-        if self.top > 435 and self.top < 450 and self.left >= 212 and
-        self.left < 311:
+        if (self.top > 435 and self.top < 450 and self.left >= 212 and
+            self.left < 311):
             self.top = 435
-        if self.top > 336 and self.bottom < 350 and self.left < 211 and
-        self.right > 185:
+        if (self.top > 336 and self.bottom < 350 and self.left < 211 and
+            self.right > 185):
             self.top = 336
-        if self.left < 312 and self.right > 290 and self.bottom < 464 and
-        self.top > 436:
+        if (self.left < 312 and self.right > 290 and self.bottom < 464 and
+            self.top > 436):
             self.left = 312
 
         # boundary of wall right up
-        if self.right > 590 and self.left < 586 and self.top > 338 and
-        self.bottom < 464:
+        if (self.right > 590 and self.left < 586 and self.top > 338 and
+            self.bottom < 464):
             self.left = 586
-        if self.right > 560 and self.right < 582 and self.bottom < 435 and
-        self.top > 338:
+        if (self.right > 560 and self.right < 582 and self.bottom < 435 and
+            self.top > 338):
             self.right = 560
-        if self.right > 462 and self.left < 586 and self.bottom < 464 and
-        self.top > 460:
+        if (self.right > 462 and self.left < 586 and self.bottom < 464 and
+            self.top > 460):
             self.bottom = 464
-        if self.top > 435 and self.top < 450 and self.right <= 560 and
-        self.right > 462:
+        if (self.top > 435 and self.top < 450 and self.right <= 560 and
+            self.right > 462):
             self.top = 435
-        if self.top > 336 and self.bottom < 350 and self.left < 586 and
-        self.right > 561:
+        if (self.top > 336 and self.bottom < 350 and self.left < 586 and
+            self.right > 561):
             self.top = 336
-        if self.left < 440 and self.right > 462 and self.bottom < 464 and
-        self.top > 436:
+        if (self.left < 440 and self.right > 462 and self.bottom < 464 and
+            self.top > 436):
             self.right = 462
 
         # boundary of wall left down
-        if self.right > 185 and self.left < 180 and self.top > 88 and
-        self.bottom < 213:
+        if (self.right > 185 and self.left < 180 and self.top > 88 and
+            self.bottom < 213):
             self.right = 184
-        if self.left < 212 and self.right > 200 and self.top > 111 and
-        self.bottom < 213:
+        if (self.left < 212 and self.right > 200 and self.top > 111 and
+            self.bottom < 213):
             self.left = 212
-        if self.right > 185 and self.left < 312 and self.bottom < 21 and
-        self.top > 88:
+        if (self.right > 185 and self.left < 312 and self.bottom < 21 and
+            self.top > 88):
             self.top = 88
-        if self.bottom < 111 and self.bottom > 100 and self.left >= 212 and
-        self.left < 311:
+        if (self.bottom < 111 and self.bottom > 100 and self.left >= 212 and
+            self.left < 311):
             self.bottom = 112
-        if self.top > 336 and self.bottom < 213 and self.left < 211 and
-        self.right > 185:
+        if (self.top > 336 and self.bottom < 213 and self.left < 211 and
+            self.right > 185):
             self.bottom = 213
-        if self.left < 312 and self.right > 290 and self.top > 88 and
-        self.bottom < 111:
+        if (self.left < 312 and self.right > 290 and self.top > 88 and
+            self.bottom < 111):
             self.left = 312
 
         # boundary of wall lef right down
-        if self.right > 590 and self.left < 586 and self.top > 88 and
-        self.bottom < 213:
+        if (self.right > 590 and self.left < 586 and self.top > 88 and
+            self.bottom < 213):
             self.left = 586
-        if self.right > 560 and self.right < 582 and self.top > 111 and
-        self.bottom < 213:
+        if (self.right > 560 and self.right < 582 and self.top > 111 and
+            self.bottom < 213):
             self.right = 560
-        if self.right > 462 and self.left < 586 and self.bottom < 21 and
-        self.top > 88:
+        if (self.right > 462 and self.left < 586 and self.bottom < 21 and
+            self.top > 88):
             self.top = 88
-        if self.bottom < 111 and self.bottom > 100 and self.right <= 560 and
-        self.right > 462:
+        if (self.bottom < 111 and self.bottom > 100 and self.right <= 560 and
+            self.right > 462):
             self.bottom = 112
-        if self.top > 336 and self.bottom < 213 and self.left < 586 and
-        self.right > 561:
+        if (self.top > 336 and self.bottom < 213 and self.left < 586 and
+            self.right > 561):
             self.bottom = 213
-        if self.left < 440 and self.right > 462 and self.top > 88 and
-        self.bottom < 111:
+        if (self.left < 440 and self.right > 462 and self.top > 88 and
+            self.bottom < 111):
             self.right = 462
 
 
@@ -501,60 +501,60 @@ class Ch3View(arcade.View):
 
         elif key == arcade.key.SPACE:
 
-            if (self.player.center_x >= 290 and self.player.center_x <= 515) and
-            (self.player.top >= 555):
+            if ((self.player.center_x >= 290 and self.player.center_x <= 515) and
+                (self.player.top >= 555)):
                 self.x += 1
 
-            elif (self.player.left >= 0 and self.player.right <= 120) and
-            (self.player.bottom >= 505) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False:
+            elif ((self.player.left >= 0 and self.player.right <= 120) and
+                  (self.player.bottom >= 505) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1) is False):
                 self.button_on(1)
                 self.star_1 += 1
                 if self.star_1 == 1:
                     self.star_sprite()
                 self.puzzle.add_value(1)
 
-            elif (self.player.left >= 0 and self.player.right <= 120) and
-            (self.player.bottom >= 505) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1):
+            elif ((self.player.left >= 0 and self.player.right <= 120) and
+                  (self.player.bottom >= 505) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 1)):
                 self.button_off(1)
                 self.puzzle.remove_value(1)
 
-            elif (self.player.left >= 0 and self.player.right <= 120) and
-            (self.player.bottom <= 150) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False:
+            elif ((self.player.left >= 0 and self.player.right <= 120) and
+                  (self.player.bottom <= 150) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2) is False):
                 self.button_on(2)
                 self.star_2 += 1
                 if self.star_2 == 1:
                     self.star_sprite()
                 self.puzzle.add_value(2)
 
-            elif (self.player.left >= 0 and self.player.right <= 120) and
-            (self.player.bottom <= 150) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2):
+            elif ((self.player.left >= 0 and self.player.right <= 120) and
+                  (self.player.bottom <= 150) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 2)):
                 self.button_off(2)
                 self.puzzle.remove_value(2)
 
-            elif (self.player.left >= 680) and (self.player.bottom >= 505) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
+            elif ((self.player.left >= 680) and (self.player.bottom >= 505) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False):
                 self.button_on(3)
                 self.puzzle.add_value(3)
 
-            elif (self.player.left >= 680) and (self.player.bottom >= 505) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
+            elif ((self.player.left >= 680) and (self.player.bottom >= 505) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3)):
                 self.button_off(3)
                 self.puzzle.remove_value(3)
 
-            elif (self.player.left >= 680) and (self.player.bottom <= 150) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
+            elif ((self.player.left >= 680) and (self.player.bottom <= 150) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False):
                 self.button_on(4)
                 self.star_3 += 1
                 if self.star_3 == 1:
                     self.star_sprite()
                 self.puzzle.add_value(4)
 
-            elif (self.player.left >= 680) and (self.player.bottom <= 150) and
-            self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
+            elif ((self.player.left >= 680) and (self.player.bottom <= 150) and
+                  self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4)):
                 self.button_off(4)
                 self.puzzle.remove_value(4)
 
