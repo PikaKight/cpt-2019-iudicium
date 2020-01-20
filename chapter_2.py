@@ -54,6 +54,7 @@ def merge_sort(numbers: List[int]) -> List[int]:
 
 
 class Player(arcade.Sprite):
+    bag = []
 
     # Create a direction not when the player hit a button
     @classmethod
@@ -75,12 +76,10 @@ class Player(arcade.Sprite):
         self._Player_jump_speed = 3
         self._view_bottom = 0
         self._view_left = 0
-
-        self._coins = 0
-        self.bag = []
-        self.open_door = False
-
         self._charge_power = 0
+        self._coins = 0
+
+        self.open_door = False
 
     def get_player_move_speed(self):
         return self._Player_move_speed
@@ -163,7 +162,7 @@ class Player(arcade.Sprite):
         Check if the player have 10 Coins. If so, he can open the door, else he can't
         :return: if the player can open the door(bool)
         """
-        if len(self.bag) is 10:
+        if len(Player.bag) is 10:
             self.open_door = True
 
     def calculate_jumpspeed(self, presstime, releasetime, Player_jump_speed):
@@ -331,7 +330,7 @@ class Chapter2View(arcade.View):
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
             self.player.set_coins(self.player.get_coins()+1)
-            self.player.bag.append(self.player.get_coins())
+            Player.bag.append(self.player.get_coins())
 
         # Check fi the player hit the button, remove it and display the direction if so
         button_hit_list = arcade.check_for_collision_with_list(self.player, self.button_list)
