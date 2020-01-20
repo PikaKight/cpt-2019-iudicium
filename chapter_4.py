@@ -2,6 +2,7 @@ import arcade
 import random
 import math
 import json
+from typing import List
 import settings
 
 
@@ -54,8 +55,8 @@ class Slime(arcade.Sprite):
             self.change_y *= -1
 
 
-# class Fish(Slime):
-#     pass
+class Fish(Slime):
+    pass
 
 
 def fish(self):
@@ -76,13 +77,42 @@ def fish(self):
         fish(self)
 
 
+def merge_sort(numbers: List[int]) -> List[int]:
+    if len(numbers) == 1:
+        return numbers
+
+    midpoint = len(numbers)//2
+
+    left_side = merge_sort(numbers[:midpoint])
+    right_side = merge_sort(numbers[midpoint:])
+    sorted_list = []
+
+    left_marker = 0
+    right_marker = 0
+    while left_marker < len(left_side) and right_marker < len(right_side):
+        if left_side[left_marker] < right_side[right_marker]:
+            sorted_list.append(left_side[left_marker])
+            left_marker += 1
+        else:
+            sorted_list.append(right_side[right_marker])
+            right_marker += 1
+    
+    while right_marker < len(right_side):
+        sorted_list.append(right_side[right_marker])
+        right_marker += 1
+    
+    while left_marker < len(left_side):
+        sorted_list.append(left_side[left_marker])
+        left_marker += 1
+    
+    print(sorted_list)
+    return sorted_list
+
+
 class ch4_MenuView(arcade.View):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("Sprites/whiteBorders_blackBackground.jpg")
-
-    def on_show(self):
-        pass
     
     def on_draw(self):
         arcade.start_render()
@@ -189,7 +219,7 @@ class gameView(arcade.View):
         self.all_sprite_list.append(self.player)
 
         # SLIME Sprite
-        for i in range(1):
+        for i in range(2):
             slime_sprite = Slime("Sprites/slimeGreen.png", 0.5)
 
             slime_sprite.center_x = random.randrange(5, settings.WIDTH - 5)
@@ -203,9 +233,6 @@ class gameView(arcade.View):
 
             self.slime_list.append(slime_sprite)
             self.all_sprite_list.append(slime_sprite)
-
-    def on_show(self):
-        arcade.set_background_color(arcade.color.GHOST_WHITE)
 
     def on_draw(self):
         arcade.start_render()
@@ -274,9 +301,12 @@ class gameView(arcade.View):
         
         # All slimes defeated
         if len(self.slime_list) == 0:
-            data = {"game_stats": []}
-            game_stats = {f"{self.total_time}": {"Total Damage Taken": self.total_damage, "Total Lasers Used":self.total_lasers}}
+            with open("chapter_4_scores.json") as json_file:
+                data = json.load(json_file)
+
+            game_stats = {"Total Time": round(self.total_time, 2), "Total Damage": self.total_damage, "Total Lasers Used":self.total_lasers}
             data["game_stats"].append(game_stats)
+
             with open("chapter_4_scores.json", "w") as f:
                 json.dump(data, f)
 
@@ -335,9 +365,6 @@ class gameOverView(arcade.View):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("Sprites/gameOver_screen.jpg")
-
-    def on_show(self):
-        pass
     
     def on_draw(self):
         arcade.start_render()
@@ -377,9 +404,21 @@ class winView(arcade.View):
 
         arcade.draw_text("CONGRATULATIONS! YOU WIN", settings.WIDTH/2, settings.HEIGHT/2 + 100,
                         arcade.color.BLACK, font_size=30, bold=True, anchor_x="center", anchor_y="center")
+
+        # Present Player Score
+        with open("chapter_4_scores.json") as json_file:
+            data = json.load(json_file)
+
+        arcade.draw_text(f"""Your Score
+        Time: {data["game_stats"][-1]}""",
+        # Total Damage: {data["game_stats"][-1]["Total Damage"]}
+        # Total Lasers: {data["game_stats"][-1]["Total Lasers Used"]}""",
+                        settings.WIDTH/2, settings.HEIGHT/2, arcade.color.BLACK, font_size=20,
+                        anchor_x="center", anchor_y="center")
+
         arcade.draw_text("""Press ENTER to see Scoreboard
 
-    Press ESC to Exit Game""", settings.WIDTH/2, settings.HEIGHT/2,
+    Press ESC to Exit Game""", settings.WIDTH/2, settings.HEIGHT/2 - 100,
                         arcade.color.BLACK, font_size=20, anchor_x="center", anchor_y="center")
 
     def on_key_press(self, key, modifiers):
@@ -413,11 +452,23 @@ class Scoreboard(arcade.View):
     the game in the shortest time:""", self.menu.center_x,
                         self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
                         anchor_x="center", anchor_y="center")
+        
+
+
         arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
 
     def update(self, delta_time):
-        pass
+        # Place Player times into separate list
+        with open("chapter_4_scores.json") as json_file:
+            data = json.load(json_file)
+        
+        time_list = []
+        for i in data["game_stats"]:
+            time_list.append(i["Total Time"])
+        
+        # Sort the list of player times
+        merge_sort(time_list)
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
