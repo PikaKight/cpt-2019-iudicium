@@ -487,6 +487,15 @@ class WinView(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
+
+        with open ("Chapter_3_score.json", 'r') as f:
+            game = json.load(f)
+
+        arcade.draw_text(f"""
+                      You've Complete Chapter 3!
+                     {game[len(game) - 1]}
+                        """, settings.WIDTH/2 - 125, settings.HEIGHT/2,
+                        arcade.color.BLACK, font_size=35, anchor_x="center")
         arcade.draw_text("""
                             Press ENTER to see Scoreboard
                         
@@ -555,8 +564,8 @@ if __name__ == "__main__":
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
     # my_view = ch3_MenuView()
     # my_view = Instructions()
-    my_view = Ch3View()
-    # my_view = WinView()
+    # my_view = Ch3View()
+    my_view = WinView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
