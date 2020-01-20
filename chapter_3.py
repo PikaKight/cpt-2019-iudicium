@@ -57,7 +57,7 @@ class Player(arcade.Sprite):
             self.left = 212
         if self.right > 185 and self.left < 312 and self.bottom < 21 and self.top > 88:
             self.top = 88
-        if self.bottom < 111 and self.bottom > 105 and self.left >= 212 and self.left < 311:
+        if self.bottom < 111 and self.bottom > 100 and self.left >= 212 and self.left < 311:
             self.bottom = 112
         if self.top > 336 and self.bottom < 213 and self.left < 211 and self.right > 185:
             self.bottom = 213
@@ -71,7 +71,7 @@ class Player(arcade.Sprite):
             self.right = 560
         if self.right > 462 and self.left < 586 and self.bottom < 21 and self.top > 88:
             self.top = 88
-        if self.bottom < 111 and self.bottom > 105 and self.right <= 560 and self.right > 462:
+        if self.bottom < 111 and self.bottom > 100 and self.right <= 560 and self.right > 462:
             self.bottom = 112
         if self.top > 336 and self.bottom < 213 and self.left < 586 and self.right > 561:
             self.bottom = 213
@@ -106,8 +106,9 @@ class Puzzle:
         Arg:
             value is the order number for the buttons 
         """
-        self._puzzle.remove(value)
-
+        for i, num in enumerate(self._puzzle):
+            if num is value:
+                return self._puzzle.pop(i)
 
     def give_puzzle(self):
         """ gives the list that is self._puzzle
@@ -460,7 +461,6 @@ class Ch3View(arcade.View):
                 self.button_off(4)
                 self.puzzle.remove_value(4)
                 
-
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
         if key == arcade.key.A or key == arcade.key.D:
@@ -518,10 +518,21 @@ class Scoreboard(arcade.View):
         with open("Chapter_3_score.json", 'r') as f:
             self.game = json.load(f)
 
-        self.new_game = self.sort_scores(self.game)
+        self.new_game = self.sort_scores()
     
-    def sort_scores(self, data: list):
-        
+    def order(x, y):
+        if x[1] < y[1]:
+            return x, y
+        else: 
+            return y, x
+
+    def sort_scores(self):
+        d_items = self.game.items()
+        for j in range(len(d_items) - 1):
+            for i in range(len(d_items) - 1):
+                d_items[i], d_items[j+1] = self.order(d_items[i], d_items[j+1])
+            
+            return d_items   
 
     def on_draw(self):
         arcade.start_render()
