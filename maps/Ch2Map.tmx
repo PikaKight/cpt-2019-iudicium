@@ -23,7 +23,7 @@
  </tileset>
  <layer id="1" name="Platform_layer" width="25" height="50">
   <data encoding="base64" compression="zlib">
-   eAHtkdsKAzEIRAvb///mrg8DIhqvaVPYQDAXM8cx12vvuG55mjvHw4h39+nV//fqfVvAtNzgnqL35zzX0qNzyrOGx7DeaeeoR95pjFVN8n1krzEi7zI5v2ZY/c14oNwJH14tUYans/IWZUiNDLPKkMzVPsvI1A9ulEHa1eExOtqoyWMgr8OKMsCqxAwD/531lGFYHjzmBMNi47zDQO9Ii6+hjdhhQMOLuxjwRXEXg3urMqg+a8i7KsPS184jDF4XX2t62lmEob3DGTHlxB3iilGpGbo8rhg8r7M+gcF7XfVS8cG5kT+rMLJ+TmDwvmTrR/4JPlBLJ0ofE72R9UiGvJ/Yf5PBezS9Jh8fO/wCeQ==
+   eAHtkdsKAyEMRAvb///mbh4GhpCYi9paWEHiJc7JxOu1d1y3vMyd42Hku/v06v979b4tYHpucC8x+nPO9fTkXPK8ETG8d9Y56tF3FmNUk36f2VuMzLtKzq8ZXn8rHiR3hY+oliwj0hl5yzK0RoXZZWjmaF9lVOoHN8sQ7e7IMrr68i7D6PSHa8owOL+zrjDgp/o3FYbnIWKuYHhsnM8w0DvR4jW0EWcY0IjiLgZ8SdzFYG9dhtTnDX3XZXj61nmGwXXx2tKzzjIM6x3OhKkn7hBHjE7N0OU4YnDezPoEBve666Xjg7mZP+swqn5OYHBfqvUj/wQfqGUmah8reqPr0Qx9v2L/TQb3aPVafHwAOlwCeQ==
   </data>
  </layer>
  <layer id="5" name="Door_layer" width="25" height="50">
@@ -33,7 +33,7 @@
  </layer>
  <layer id="3" name="Coin_layer" width="25" height="50">
   <data encoding="base64" compression="zlib">
-   eAHtk0EOADAEBPn/p/sC0uCwZFwbsmbUjIIABCYI+MQQZkgTUHKslEVaGuEg0CRw+a9d3q2p/bsdhjGqKptqX5yEl20EuIFtxnTycjs6LkiSE3hxsAAL
+   eAHt08ENACAIQ1Hcf2knwAMJWOB7NZryrGYsBHYInB1jMmWigFKHlLIkknM1At8FJv+1ybNVFQdDXzpqEz3nJ2GnmwAd6PZiOnnpjs5bkOQtcAFyEAAL
   </data>
  </layer>
  <layer id="6" name="Button_layer" width="25" height="50">
