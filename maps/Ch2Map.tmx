@@ -3,23 +3,23 @@
  <tileset firstgid="1" name="Coin" tilewidth="104" tileheight="116" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
-   <image width="104" height="116" source="Sprites/Coin.png"/>
+   <image width="104" height="116" source="../Sprites/Coin.png"/>
   </tile>
  </tileset>
  <tileset firstgid="2" name="Door" tilewidth="128" tileheight="128" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
-   <image width="128" height="128" source="Sprites/Door_close.png"/>
+   <image width="128" height="128" source="../Sprites/Door_close.png"/>
   </tile>
  </tileset>
  <tileset firstgid="3" name="Wall" tilewidth="128" tileheight="128" tilecount="1" columns="1">
-  <image source="Sprites/mud_wall.jpg" width="128" height="128"/>
+  <image source="../Sprites/mud_wall.jpg" width="128" height="128"/>
  </tileset>
  <tileset firstgid="4" name="Ground" tilewidth="128" tileheight="128" tilecount="1" columns="1">
-  <image source="Sprites/Grass_mud.png" width="128" height="128"/>
+  <image source="../Sprites/Grass_mud.png" width="128" height="128"/>
  </tileset>
  <tileset firstgid="5" name="Button" tilewidth="128" tileheight="128" tilecount="1" columns="1">
-  <image source="Sprites/Button.png" width="128" height="128"/>
+  <image source="../Sprites/Button.png" width="128" height="128"/>
  </tileset>
  <layer id="1" name="Platform_layer" width="25" height="50">
   <data encoding="base64" compression="zlib">
