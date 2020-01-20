@@ -291,9 +291,10 @@ class Chapter2View(arcade.View):
         if self.up_pressed is False:
             self.player.charge_power = 0
         else:
-            self.player.charge_power += 1
-            if self.player.charge_power > 69:
-                self.player.charge_power = 70
+            if self.player.change_y == 0:
+                self.player.charge_power += 1
+                if self.player.charge_power > 69:
+                    self.player.charge_power = 70
 
         self.player.update()
         self.physics_engine.update()
@@ -334,7 +335,8 @@ class Chapter2View(arcade.View):
             # Set the highest player jump speed is 15
             if self.player.Player_jump_speed > 15:
                 self.player.Player_jump_speed = 15
-            self.player.change_y += self.player.Player_jump_speed
+            if self.player.change_y == 0:
+                self.player.change_y += self.player.Player_jump_speed
 
         if key == arcade.key.RIGHT:
             self.right_pressed = False
