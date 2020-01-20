@@ -229,7 +229,8 @@ class Instructions(arcade.View):
                         settings.WIDTH/2 + 100, settings.HEIGHT/2 + 100, arcade.color.WHITE,
                         font_size=15, anchor_x="center", anchor_y="center")
 
-        arcade.draw_text("""Stars are worth 1 pt and will spawn 
+        arcade.draw_text("""
+                            Stars are worth 1 pt and will spawn 
                             when the first correct button is pressed
                         """,settings.WIDTH/2 + 100, settings.HEIGHT/2, arcade.color.WHITE,
                         font_size=20, anchor_x="center", anchor_y="center")  
@@ -240,8 +241,8 @@ class Instructions(arcade.View):
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            riddle = Riddle()
-            self.window.show_view(riddle)
+            ch3 = Ch3View()
+            self.window.show_view(ch3)
         elif key == arcade.key.ESCAPE:
             arcade.close_window()
             self.director.next_view()
@@ -443,9 +444,6 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3) is False:
                 self.button_on(3)
-                self.star_3 += 1
-                if self.star_4 == 1:
-                    self.star_sprite()
                 self.puzzle.add_value(3)
 
             elif (self.player.left  >= 680) and (self.player.bottom >= 505) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 3):
@@ -454,6 +452,9 @@ class Ch3View(arcade.View):
                 
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4) is False:
                 self.button_on(4)
+                self.star_3 += 1
+                if self.star_3 == 1:
+                    self.star_sprite()
                 self.puzzle.add_value(4)
         
             elif (self.player.left  >= 680) and (self.player.bottom <= 150) and self.puzzle.value_checker(self.puzzle.clone_puzzle(), 4):
@@ -586,7 +587,7 @@ class Scoreboard(arcade.View):
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
-            self.director.next_view()   
+            self.director.next_view() 
 
 if __name__ == "__main__":
     """This section of code will allow you to run your View
