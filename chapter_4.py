@@ -459,21 +459,6 @@ class Scoreboard(arcade.View):
         
         # Sort the list of player times
         self.sorted_times_list = merge_sort(time_list)
-
-        # Get the top 5 Player game stats
-        # for len(self.sorted_times_list):
-        #     for i in data["game_stats"]:
-        #         if i["Total Time"] == self.sorted_times_list[a]:
-        #             first = i
-        #         elif i["Total Time"] == self.sorted_times_list[1]:
-        #             second = i
-        #         elif i["Total Time"] == self.sorted_times_list[2]:
-        #             third = i
-        #         elif i["Total Time"] == self.sorted_times_list[3]:
-        #             fourth = i
-        #         elif i["Total Time"] == self.sorted_times_list[4]:
-        #             fifth = i
-
     
     def on_draw(self):
         arcade.start_render()
@@ -488,25 +473,15 @@ class Scoreboard(arcade.View):
                         anchor_x="center", anchor_y="center")
         
         n = 0
-        l = 80
+        l = 130
         for i in self.sorted_times_list:
             a = self.sorted_times_list[n]
-            arcade.draw_text(f"{n+1}. {a}", self.menu.center_x, self.menu.center_y + l,
+            arcade.draw_text(f"{n+1}. {a} s", self.menu.center_x, self.menu.center_y + l,
                             arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
             n += 1
             l -= 18
-        
-#         arcade.draw_text(f"""1. {self.sorted_times_list[0]} s
-
-# 2. {self.sorted_times_list[1]} s
-
-# 3. {self.sorted_times_list[2]} s
-
-# 4. {self.sorted_times_list[3]} s
-
-# 5. {self.sorted_times_list[4]} s""",
-#                         self.menu.center_x, self.menu.center_y + 80, arcade.color.BLACK, font_size=15,
-#                         anchor_x="center", anchor_y="center")
+            if n == 5:
+                break
 
         arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
@@ -532,7 +507,7 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    my_view = gameView()
+    my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
