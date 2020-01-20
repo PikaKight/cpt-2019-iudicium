@@ -159,30 +159,6 @@ class Instructions(arcade.View):
         self.fish.center_x = settings.WIDTH/2 + 70
         self.fish.center_y = 190
 
-    # def set_slime_centerx(self, value: int):
-    #     self._slime.center_x = value
-
-    # def get_slime_centerx(self):
-    #     return self._slime.center_x
-
-    # def set_slime_centery(self, value: int):
-    #     self._slime.center_y = value
-
-    # def get_slime_centery(self):
-    #     return self._slime.center_y
-
-    # def set_fish_centerx(self, value: int):
-    #     self._fish.center_x = value
-
-    # def get_fish_centerx(self):
-    #     return self._fish.center_x
-
-    # def set_fish_centery(self, value: int):
-    #     self._fish.center_y = value
-
-    # def get_fish_centery(self):
-    #     return self._fish.center_y
-
     def on_show(self):
         arcade.set_background_color(arcade.color.GHOST_WHITE)
 
