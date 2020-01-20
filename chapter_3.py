@@ -378,9 +378,17 @@ class Ch3View(arcade.View):
         if self.puzzle.checker() is True:
             with open ("Chapter_3_score.json", 'r') as f:
                 game = json.load(f)
+            # Calculate minutes
+            minutes = int(self.total_time) // 60
 
-            final_score = {f"{self.total_time}": f"Final Star Score: {self.score}"} 
-            game["Data"].append(final_score)
+            # Calculate seconds by using a modulus (remainder)
+            seconds = int(self.total_time) % 60
+
+            # Figure out our output
+            output = f"{minutes:02d}:{seconds:02d}"
+
+            final_score = {f"{output}": f"Final Star Score: {self.score}"} 
+            game.append(final_score)
 
             with open ("Chapter_3_score.json", 'w') as f:
                 json.dump(game, f)
@@ -487,8 +495,18 @@ class WinView(arcade.View):
 class Scoreboard(arcade.View):
     def __init__(self):
         super().__init__()
+        self.half_height = settings.HEIGHT / 2
+        self.half_width = settings.WIDTH / 2
         self.scoreboard = arcade.Sprite("Sprites/Menu.png", 0.8, 0, 0, 0, 0, settings.WIDTH/2, settings.HEIGHT/2 )
         self.background = arcade.load_texture("Sprites/fancy_silhouette.png")
+        self.sort_scores()
+    
+    def sort_scores(self):
+        with open("Chapter_3_score.json", 'r') as f:
+            game = json.load(f)
+
+        start = 0
+        end = len(game["Date"]) - 1
     
     def on_draw(self):
         arcade.start_render()
@@ -497,13 +515,13 @@ class Scoreboard(arcade.View):
         
         self.scoreboard.draw()
 
-        arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
+        arcade.draw_text("Scoreboard", self.scoreboard.center_x, self.scoreboard.center_y + 260, arcade.color.BLACK,
                         font_size=30, bold=True, anchor_x="center", anchor_y="center")
 
-        arcade.draw_text("    Top 5 Players:", self.menu.center_x, self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
+        arcade.draw_text("    Top 5 Players:", self.scoreboard.center_x, self.scoreboard.center_y + 190, arcade.color.BLACK, font_size=15,
                         anchor_x="center", anchor_y="center")
 
-        arcade.draw_text("Press ENTER to CONTINUE", self.menu.center_x, self.menu.center_y - 220,
+        arcade.draw_text("Press ENTER to CONTINUE", self.scoreboard.center_x, self.scoreboard.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
     
     def update(self, delta_time):
