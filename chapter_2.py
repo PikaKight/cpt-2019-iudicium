@@ -183,7 +183,7 @@ class Chapter2View(arcade.View):
         self.button_list = arcade.SpriteList()
 
         # Read the tmx file and display the map
-        chapter2map = arcade.tilemap.read_tmx("Ch2Map.tmx")
+        chapter2map = arcade.tilemap.read_tmx("maps/Ch2Map.tmx")
         self.player = Player("Sprites/alienBlue_front.png")
         self.wall_list = arcade.tilemap.process_layer(chapter2map, "Platform_layer", 0.5)
         self.coin_list = arcade.tilemap.process_layer(chapter2map, "Coin_layer", 0.5)
