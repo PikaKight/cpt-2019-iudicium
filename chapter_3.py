@@ -392,8 +392,7 @@ class Ch3View(arcade.View):
             # Figure out our output
             output = f"{minutes:02d}:{seconds:02d}"
 
-            final_score = {f"{output}": f"Final Star Score: {self.score}"} 
-            game[output] = final_score
+            game[output] = self.score
 
             with open ("Chapter_3_score.json", 'w') as f:
                 json.dump(game, f)
@@ -482,14 +481,14 @@ class WinView(arcade.View):
         with open ("Chapter_3_score.json", 'r') as f:
             game = json.load(f)
 
-        for key in game[len(game) - 1].keys():
+        for key, value in game.items():
             time = key
         arcade.draw_text(f"""
                     You've Complete Chapter 3!
                             
                             Total Time: {key} 
                             
-                            {game[len(game) -1 ][key]}
+                            Total Star Count: {game[key]}
                         """, settings.WIDTH/2 - 125, settings.HEIGHT/2 - 50,
                         arcade.color.BLACK, font_size=35, anchor_x="center")
 
@@ -515,26 +514,44 @@ class Scoreboard(arcade.View):
         self.half_width = settings.WIDTH / 2
         self.scoreboard = arcade.Sprite("Sprites/Menu.png", 0.8, 0, 0, 0, 0, settings.WIDTH/2, settings.HEIGHT/2 )
         self.background = arcade.load_texture("Sprites/fancy_silhouette.png")
+        
         with open("Chapter_3_score.json", 'r') as f:
             self.game = json.load(f)
 
-        self.new_game = self.sort_scores()
-    
-    def order(x, y):
-        if x[1] < y[1]:
-            return x, y
-        else: 
-            return y, x
+        keys = []
 
-    def sort_scores(self):
-        d_items = self.game.items()
-        for j in range(len(d_items) - 1):
-            for i in range(len(d_items) - 1):
-                d_items[i], d_items[j+1] = self.order(d_items[i], d_items[j+1])
+        for key, value in self.game.items():
+            (m, s) = key.split(':')
+            result = int(m) * 60 + int(s)
+            keys.append(result)
+        
+        
+        self.new_keys = self.sort_scores(keys)
+        self.new_game = {}
+        
+
+        for j in self.new_keys:
+            m, s = divmod(j, 60)
+            time = f"{m:02d}:{s:02d}"
+            self.new_game[time] = self.game[time]
             
-            return d_items   
+        with open("Chapter_3_score.json", 'w') as f:
+             json.dump(self.new_game, f)
+            
+    def sort_scores(self, data: List[int]):
+        if len(data) < 2:
+            return data
+        
+        pivot = data[0]
+        l = self.sort_scores([x for x in data[1:] if x < pivot])
+        u = self.sort_scores([x for x in data[1:] if x >= pivot])
+        return l + [pivot] + u
+            
 
     def on_draw(self):
+        with open("Chapter_3_score.json", 'r') as f:
+            game = json.load(f)
+
         arcade.start_render()
         
         arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
@@ -546,6 +563,20 @@ class Scoreboard(arcade.View):
 
         arcade.draw_text("    Top 5 Players:", self.scoreboard.center_x, self.scoreboard.center_y + 190, arcade.color.BLACK, font_size=15,
                         anchor_x="center", anchor_y="center")
+
+        placement = 1
+        h = 150
+        if len(game) >= 5:
+            while placement < 5:
+                for key, value in game.items():
+                    arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}", -100, self.half_height + h, arcade.color.BLACK, 15, 1000,    "center", 'arial', True)
+                    placement += 1
+                    h -= 50
+        else:
+           for key, value in game.items():
+                arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}", -100, self.half_height + h, arcade.color.BLACK, 15, 1000,    "center", 'arial', True)
+                placement += 1
+                h -= 50 
 
         arcade.draw_text("Press ENTER to CONTINUE", self.scoreboard.center_x, self.scoreboard.center_y - 220,
                         arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
