@@ -105,7 +105,6 @@ def merge_sort(numbers: List[int]) -> List[int]:
         sorted_list.append(left_side[left_marker])
         left_marker += 1
     
-    print(sorted_list)
     return sorted_list
 
 
@@ -437,26 +436,17 @@ class Scoreboard(arcade.View):
         self.menu = arcade.Sprite("Sprites/Menu.png", 0.8)
         self.menu.center_x = settings.WIDTH/2
         self.menu.center_y = settings.HEIGHT/2
-    
+
+        self.sorted_times_list = None
+        
+        self.first = None
+        self.second = None
+        self.third = None
+        self.fourth = None
+        self.fifth = None
+
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-    
-    def on_draw(self):
-        arcade.start_render()
-
-        self.menu.draw()
-
-        arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
-                        font_size=30, bold=True, anchor_x="center", anchor_y="center")
-        arcade.draw_text("""    Top 5 Players that completed
-    the game in the shortest time:""", self.menu.center_x,
-                        self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
-                        anchor_x="center", anchor_y="center")
-        
-
-
-        arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
-                        arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
 
     def update(self, delta_time):
         # Place Player times into separate list
@@ -468,8 +458,59 @@ class Scoreboard(arcade.View):
             time_list.append(i["Total Time"])
         
         # Sort the list of player times
-        merge_sort(time_list)
+        self.sorted_times_list = merge_sort(time_list)
 
+        # Get the top 5 Player game stats
+        # for len(self.sorted_times_list):
+        #     for i in data["game_stats"]:
+        #         if i["Total Time"] == self.sorted_times_list[a]:
+        #             first = i
+        #         elif i["Total Time"] == self.sorted_times_list[1]:
+        #             second = i
+        #         elif i["Total Time"] == self.sorted_times_list[2]:
+        #             third = i
+        #         elif i["Total Time"] == self.sorted_times_list[3]:
+        #             fourth = i
+        #         elif i["Total Time"] == self.sorted_times_list[4]:
+        #             fifth = i
+
+    
+    def on_draw(self):
+        arcade.start_render()
+
+        self.menu.draw()
+
+        arcade.draw_text("Scoreboard", self.menu.center_x, self.menu.center_y + 260, arcade.color.BLACK,
+                        font_size=30, bold=True, anchor_x="center", anchor_y="center")
+        arcade.draw_text("""    Shortest amount of time
+    taken to complete the game:""", self.menu.center_x,
+                        self.menu.center_y + 190, arcade.color.BLACK, font_size=15,
+                        anchor_x="center", anchor_y="center")
+        
+        n = 0
+        l = 80
+        for i in self.sorted_times_list:
+            a = self.sorted_times_list[n]
+            arcade.draw_text(f"{n+1}. {a}", self.menu.center_x, self.menu.center_y + l,
+                            arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
+            n += 1
+            l -= 18
+        
+#         arcade.draw_text(f"""1. {self.sorted_times_list[0]} s
+
+# 2. {self.sorted_times_list[1]} s
+
+# 3. {self.sorted_times_list[2]} s
+
+# 4. {self.sorted_times_list[3]} s
+
+# 5. {self.sorted_times_list[4]} s""",
+#                         self.menu.center_x, self.menu.center_y + 80, arcade.color.BLACK, font_size=15,
+#                         anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("Press ESC to Exit Game", self.menu.center_x, self.menu.center_y - 220,
+                        arcade.color.BLACK, font_size=15, anchor_x="center", anchor_y="center")
+        
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
