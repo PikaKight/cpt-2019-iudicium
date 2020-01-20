@@ -1,6 +1,8 @@
 import arcade, settings
 
-speed = 6
+from typing import List
+
+speed = 7 #the player's speed
 
 class Player(arcade.Sprite):
     def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
@@ -81,27 +83,43 @@ class Puzzle:
     solution = [1, 4, 2, 3]
 
     def __init__(self):
-        self._puzzle = []
+        self._puzzle = [] #to record the button press order
 
 
     def clone_puzzle(self):
+        """ creates a clone of self._puzzle so it does not affect the recorded button press. 
+        """
         self.clone = self._puzzle
         return self.clone
 
 
-    def add_value(self, value):
+    def add_value(self, value:int):
+        """ adds the button value that was pressed
+        Arg:
+            value is the order number for the buttons 
+        """
         self._puzzle.append(value)
 
 
-    def remove_value(self, value):
+    def remove_value(self, value: int):
+        """ removes the button value that was unpressed
+        Arg:
+            value is the order number for the buttons 
+        """
         self._puzzle.remove(value)
 
 
     def give_puzzle(self):
+        """ gives the list that is self._puzzle
+        return:
+            self._puzzle
+        """
         return self._puzzle
 
 
-    def value_checker(self, puzzle, value):
+    def value_checker(self, puzzle: List[], value):
+        """
+        """
         if len(puzzle) == 0:
             return False
 
@@ -120,7 +138,7 @@ class Puzzle:
     
 
     def checker(self):
-        if self._puzzle is Puzzle.solution:
+        if self._puzzle == Puzzle.solution:
             return True
 
 class ch3_MenuView(arcade.View):
@@ -289,6 +307,7 @@ class Riddle(arcade.View):
 class Ch3View(arcade.View):
     def __init__(self):
         super().__init__()
+        self.total_time = 0.0
         self.puzzle = Puzzle()
         self.half_width = settings.WIDTH * .5
         self.half_height = settings.HEIGHT * .5
@@ -297,7 +316,15 @@ class Ch3View(arcade.View):
         self.background = arcade.load_texture("Sprites/brown-stone-seamless-background-vector-illustration-game-texture-68967465.jpg")
 
 
-    def button_on(self, value):
+    def button_on(self, value: int):
+        """ creates the different on button sprites for the give value
+
+        Arg:
+            value is the number that is given when the button is pressed by the user using the space key on the button.
+
+        Return:   
+            The on button sprite for the given value
+        """
         if value is 1:
             self.button_1 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 50, 570)
         elif value is 2:
@@ -307,15 +334,23 @@ class Ch3View(arcade.View):
         elif value is 4:    
             self.button_4 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 75)
 
-    def button_off(self, value):    
-            if value is 1:
-                self.button_1 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 570)
-            elif value is 2:
-                self.button_2 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 75)
-            elif value is 3:   
-                self.button_3 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 570)
-            elif value is 4:    
-                self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
+    def button_off(self, value): 
+        """ creates the different off button sprites for the give value
+
+        Arg:
+            value is the number that is given when the button is pressed by the user using the space key on the button.
+
+        Return:   
+            The off button sprite for the given value
+        """   
+        if value is 1:
+            self.button_1 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 570)
+        elif value is 2:
+            self.button_2 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 50, 75)
+        elif value is 3:   
+            self.button_3 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 570)
+        elif value is 4:    
+            self.button_4 = arcade.Sprite(settings.button, .7, 0 ,0, 0, 0, 750, 75)
 
     def on_show(self):
         self.button_off(1)
@@ -340,9 +375,25 @@ class Ch3View(arcade.View):
         self.button_3.draw()
         self.button_4.draw()
         self.player.draw()
+        # Calculate minutes
+        minutes = int(self.total_time) // 60
+
+        # Calculate seconds by using a modulus (remainder)
+        seconds = int(self.total_time) % 60
+
+        # Figure out our output
+        output = f"Time: {minutes:02d}:{seconds:02d}"
+
+        # Output the timer text.
+        arcade.draw_text(output, 270, 565, arcade.color.BLACK, 30, 250, "center", "arial")
+
 
     def update(self, delta_time):
         self.player.update()
+        self.total_time += delta_time
+        if self.puzzle.checker() is True:
+            winView = WinView()
+            self.window.show_view(winView)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_RIGHT:
@@ -412,7 +463,34 @@ class Ch3View(arcade.View):
         elif key == arcade.key.W or key == arcade.key.S:
             self.player.change_y = 0
 
-           
+class WinView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.half_width, self.half_height = settings.WIDTH / 2, settings.HEIGHT /2
+        self.background = arcade.load_texture("Sprites/fancy_silhouette.png")
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
+        arcade.draw_text("""
+                            Press ENTER to see Scoreboard
+                        
+                           Press ESC to go to Chapter 4
+                        """, settings.WIDTH/2 - 125, settings.HEIGHT/2 - 250,
+                        arcade.color.BLACK, font_size=35, anchor_x="center")
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            scoreboard_View = Scoreboard()
+            self.window.show_view(scoreboard_View)
+        elif key == arcade.key.ESCAPE:
+            self.director.next_view()
+
+class Scoreboard(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+        
 if __name__ == "__main__":
     """This section of code will allow you to run your View
     independently from the main.py file and its Director.
@@ -425,6 +503,7 @@ if __name__ == "__main__":
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
     # my_view = ch3_MenuView()
     my_view = Ch3View()
+    # my_view = WinView()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
