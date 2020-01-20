@@ -57,7 +57,7 @@ class Player(arcade.Sprite):
             self.left = 212
         if self.right > 185 and self.left < 312 and self.bottom < 21 and self.top > 88:
             self.top = 88
-        if self.bottom < 111 and self.bottom > 105 and self.left >= 212 and self.left < 311:
+        if self.bottom < 111 and self.bottom > 100 and self.left >= 212 and self.left < 311:
             self.bottom = 112
         if self.top > 336 and self.bottom < 213 and self.left < 211 and self.right > 185:
             self.bottom = 213
@@ -71,7 +71,7 @@ class Player(arcade.Sprite):
             self.right = 560
         if self.right > 462 and self.left < 586 and self.bottom < 21 and self.top > 88:
             self.top = 88
-        if self.bottom < 111 and self.bottom > 105 and self.right <= 560 and self.right > 462:
+        if self.bottom < 111 and self.bottom > 100 and self.right <= 560 and self.right > 462:
             self.bottom = 112
         if self.top > 336 and self.bottom < 213 and self.left < 586 and self.right > 561:
             self.bottom = 213
