@@ -1,6 +1,7 @@
 import arcade
 import settings
 import json
+from typing import List
 
 Left_ViewPoint_Margin = 150
 Right_ViewPoint_Margin = 150
@@ -9,10 +10,25 @@ Top_ViewPoint_Margin = 400
 
 WIDTH = 800
 HEIGHT = 600
-
 Gravity = 0.5
 
-def merge_sort(numbers):
+
+def linear_search(target: int, numbers: List[int]) -> int:
+    """Search for a target value.
+
+    Args:
+        target: The int to search for.
+        numbers: List of numbers.
+    Returns:
+        Index location of the found target number. -1 if not found.
+    """
+    for i, num in enumerate(numbers):
+        if num == target:
+            return i
+    return -1
+
+
+def merge_sort(numbers: List[int]) -> List[int]:
     if len(numbers) == 1:
         return numbers
 
@@ -39,8 +55,23 @@ def merge_sort(numbers):
         right_pointer += 1
     return sorted_list
 
+
 class Player(arcade.Sprite):
-    def __init__(self, filename=None, scale=0.3, center_x=128, center_y=128):
+
+    # Create a direction not when the player hit a button
+    @classmethod
+    def create_direction(cls, button_hit_time: int):
+        if button_hit_time == 1 or button_hit_time == 4:
+            return arcade.draw_text("Go Down", my_view.player.center_x - 30, my_view.player.center_y + 70,
+                                    arcade.csscolor.RED, 15)
+        if button_hit_time == 2:
+            return arcade.draw_text("Go Right", my_view.player.center_x - 30, my_view.player.center_y + 70,
+                                    arcade.csscolor.RED, 15)
+        if button_hit_time == 3:
+            return arcade.draw_text("Go Left", my_view.player.center_x - 30, my_view.player.center_y + 70,
+                                    arcade.csscolor.RED, 15)
+
+    def __init__(self, filename=None, scale=0.3, center_x=760, center_y=128):
         super().__init__(filename=filename, scale=scale, center_x=center_x, center_y=center_y)
 
         self.Player_move_speed = 3
@@ -56,6 +87,8 @@ class Player(arcade.Sprite):
         self.score = 0
 
     def update(self):
+
+        # Create the view change when player moves
         changed = False
 
         left_boundary = self.view_left + Left_ViewPoint_Margin
@@ -92,32 +125,51 @@ class Player(arcade.Sprite):
                                 HEIGHT + self.view_bottom)
 
     def check_bag(self):
+        """
+        Check if the player have 10 Coins. If so, he can open the door, else he can't
+        :return: if the player can open the door(bool)
+        """
         if len(self.bag) is 10:
             self.open_door = True
 
     def calculate_jumpspeed(self, presstime, releasetime, Player_jump_speed):
+        """
+        calculate the jump speed of the player based on the time they press space. Using recursion.
+        :param presstime: the time when player press space(int)
+        :param releasetime: the time when player release space(int)
+        :param Player_jump_speed: the player's original jump speed(int)
+        :return: the new jump speed of the player(int)
+        """
         if releasetime - presstime <= 0:
             return Player_jump_speed
         else:
             Player_jump_speed += 1
-            return self.calculate_jumpspeed(presstime, releasetime-0.1 , Player_jump_speed)
+            return self.calculate_jumpspeed(presstime, releasetime - 0.1, Player_jump_speed)
 
     def display_score(self, scores):
+        """
+        write the score to the score file and using merge sort the sort the score
+        :param scores: the score(time) player did in the run(int)
+        """
         with open("chapter_2_scores.json", 'r') as json_file:
             data = json.load(json_file)
             data.append(round(scores, 2))
             data = merge_sort(data)
-            if len(data) > 3:
+            if len(data) > 20:
                 data.pop()
         with open("chapter_2_scores.json", 'w') as outfile:
             json.dump(data, outfile)
 
 
 class Chapter2View(arcade.View):
+
     def __init__(self):
         super().__init__()
         self.Total_time = 0
         self.space_press_time = 0
+        self.button_hit_time = 0
+        self.button_press_time = 0
+        self.direction_draw_time = 0
         self.score_data = None
 
         self.up_pressed = False
@@ -128,15 +180,22 @@ class Chapter2View(arcade.View):
         self.wall_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
         self.door_list = arcade.SpriteList()
+        self.button_list = arcade.SpriteList()
 
-        chapter2Map = arcade.tilemap.read_tmx("Ch2Map.tmx")
+        # Read the tmx file and display the map
+        chapter2map = arcade.tilemap.read_tmx("Ch2Map.tmx")
         self.player = Player("Sprites/alienBlue_front.png")
-        self.wall_list = arcade.tilemap.process_layer(chapter2Map, "Platform_layer", 0.5)
-        self.coin_list = arcade.tilemap.process_layer(chapter2Map, "Coin_layer", 0.5)
-        self.door_list = arcade.tilemap.process_layer(chapter2Map, "Door_layer", 0.5)
+        self.wall_list = arcade.tilemap.process_layer(chapter2map, "Platform_layer", 0.5)
+        self.coin_list = arcade.tilemap.process_layer(chapter2map, "Coin_layer", 0.5)
+        self.door_list = arcade.tilemap.process_layer(chapter2map, "Door_layer", 0.5)
+        self.button_list = arcade.tilemap.process_layer(chapter2map, "Button_layer", 0.5)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.wall_list, Gravity)
-        self.score_format = "."*15
+        self.score_format = "." * 15
+        self.information_text = "Welcome to Jump Game!\nPress Right/Left key to move\n" \
+                                "Press Space to jump, the longer you press, the higher you jump\n" \
+                                "Collect all the coins and press 'E' in front of the terminal door\n" \
+                                "The orange button will give you direction support. Good Luck!"
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLUE_SAPPHIRE)
@@ -146,50 +205,98 @@ class Chapter2View(arcade.View):
         self.wall_list.draw()
         self.coin_list.draw()
         self.door_list.draw()
+        self.button_list.draw()
         self.player.draw()
 
-        #The number of coins
+        # The number of coins
         coin_text = f"Coins: {self.player.coins}/10"
         arcade.draw_text(coin_text, self.player.center_x, self.player.center_y + 25, arcade.csscolor.BLACK, 12)
 
-        #The charge power rectangle
-        arcade.draw_rectangle_outline(self.player.center_x, self.player.center_y - 50, 20, 70, arcade.color.BLACK, 3, 90)
-        arcade.draw_rectangle_filled(self.player.center_x, self.player.center_y - 50, 20, self.player.charge_power, arcade.color.RED, 90)
+        # The charge power rectangle
+        arcade.draw_rectangle_outline(self.player.center_x, self.player.center_y - 50, 20, 70, arcade.color.BLACK, 3,
+                                      90)
+        arcade.draw_rectangle_filled(self.player.center_x, self.player.center_y - 50, 20, self.player.charge_power,
+                                     arcade.color.RED, 90)
 
-        #The end screen
+        # The end screen
         if self.end_screen is True:
             with open("chapter_2_scores.json", "r") as json_file:
                 self.score_data = json.load(json_file)
-            arcade.draw_rectangle_filled(self.player.center_x-200, self.player.center_y+210, 600, 300, arcade.color.WHITE)
-            arcade.draw_text(f"1 {self.score_format} {self.score_data[0]} SEC", self.player.center_x-350, self.player.center_y+290, arcade.csscolor.BLACK, 30)
+            arcade.draw_rectangle_filled(self.player.center_x - 200, self.player.center_y + 210, 600, 300,
+                                         arcade.color.WHITE)
+
+            if round(self.Total_time, 2) == self.score_data[0]:
+                arcade.draw_text(f"1 {self.score_format} {self.score_data[0]} SEC", self.player.center_x - 350,
+                                 self.player.center_y + 290, arcade.csscolor.RED, 30)
+            else:
+                arcade.draw_text(f"1 {self.score_format} {self.score_data[0]} SEC", self.player.center_x - 350,
+                                 self.player.center_y + 290, arcade.csscolor.BLACK, 30)
+
             try:
-                arcade.draw_text(f"2 {self.score_format} {self.score_data[1]} SEC", self.player.center_x-350, self.player.center_y+240, arcade.csscolor.BLACK, 30)
+                if round(self.Total_time, 2) == self.score_data[1]:
+                    arcade.draw_text(f"2 {self.score_format} {self.score_data[1]} SEC", self.player.center_x - 350,
+                                     self.player.center_y + 240, arcade.csscolor.RED, 30)
+                else:
+                    arcade.draw_text(f"2 {self.score_format} {self.score_data[1]} SEC", self.player.center_x - 350,
+                                     self.player.center_y + 240, arcade.csscolor.BLACK, 30)
             except:
-                arcade.draw_text("No Score", self.player.center_x-350, self.player.center_y + 240, arcade.csscolor.BLACK, 30)
+                arcade.draw_text("No Score", self.player.center_x - 350,
+                                 self.player.center_y + 240, arcade.csscolor.BLACK, 30)
+
             try:
-                arcade.draw_text(f"3 {self.score_format} {self.score_data[2]} SEC", self.player.center_x-350, self.player.center_y+190, arcade.csscolor.BLACK, 30)
+                if round(self.Total_time, 2) == self.score_data[2]:
+                    arcade.draw_text(f"3 {self.score_format} {self.score_data[2]} SEC", self.player.center_x - 350,
+                                     self.player.center_y + 190, arcade.csscolor.BLACK, 30)
+                else:
+                    arcade.draw_text(f"3 {self.score_format} {self.score_data[2]} SEC", self.player.center_x - 350,
+                                     self.player.center_y + 190, arcade.csscolor.BLACK, 30)
             except:
-                arcade.draw_text("No Score", self.player.center_x-350, self.player.center_y + 190, arcade.csscolor.BLACK, 30)
+                arcade.draw_text("No Score", self.player.center_x - 350,
+                                 self.player.center_y + 190, arcade.csscolor.BLACK, 30)
+
+            if self.Total_time > self.score_data[2]:
+                arcade.draw_text(f"{linear_search(round(self.Total_time, 2), self.score_data) + 1} {self.score_format} "
+                                 f"{round(self.Total_time, 2)} SEC", self.player.center_x - 350,
+                                 self.player.center_y + 140, arcade.csscolor.RED, 30)
+
+        # The information text
+        arcade.draw_text(self.information_text, 400, 150, arcade.csscolor.BLACK, 15)
+
+        # The direction not showing time
+        if (self.Total_time - self.button_press_time) < 5:
+            self.player.create_direction(self.button_hit_time)
 
     def update(self, delta_time: float):
         self.player.check_bag()
 
+        # Check if the player hit the coin, remove it if so
         coin_hit_list = arcade.check_for_collision_with_list(self.player, self.coin_list)
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
             self.player.coins += 1
             self.player.bag.append(self.player.coins)
 
-        self.Total_time += delta_time
-        self.player.update()
-        self.physics_engine.update()
+        # Check fi the player hit the button, remove it and display the direction if so
+        button_hit_list = arcade.check_for_collision_with_list(self.player, self.button_list)
+        for button in button_hit_list:
+            self.button_press_time = self.Total_time
+            button.remove_from_sprite_lists()
+            self.button_hit_time += 1
 
+        # Keep counting time if the game is not end
+        if self.end_screen is False:
+            self.Total_time += delta_time
+
+        # Set the charge power length
         if self.up_pressed is False:
             self.player.charge_power = 0
         else:
             self.player.charge_power += 1
             if self.player.charge_power > 69:
                 self.player.charge_power = 70
+
+        self.player.update()
+        self.physics_engine.update()
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
@@ -222,7 +329,9 @@ class Chapter2View(arcade.View):
     def on_key_release(self, key, modifiers):
         if key == arcade.key.SPACE:
             self.up_pressed = False
-            self.player.Player_jump_speed = self.player.calculate_jumpspeed(self.space_press_time, self.Total_time, self.player.Player_jump_speed)
+            self.player.Player_jump_speed = self.player.calculate_jumpspeed(self.space_press_time, self.Total_time,
+                                                                            self.player.Player_jump_speed)
+            # Set the highest player jump speed is 15
             if self.player.Player_jump_speed > 15:
                 self.player.Player_jump_speed = 15
             self.player.change_y += self.player.Player_jump_speed
