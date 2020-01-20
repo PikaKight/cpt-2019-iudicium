@@ -5,18 +5,24 @@ from typing import List
 speed = 7 #the player's speed
 
 class Player(arcade.Sprite):
+    """ Inherits from arcade.Sprite to create the player sprite and it's movements
+    """
     def __init__(self, filename=None, scale=1, image_x=0, image_y=0, image_width=0, image_height=0, center_x=0, center_y=0, repeat_count_x=1, repeat_count_y=1):
         super().__init__(filename=filename, scale=scale, image_x=image_x, image_y=image_y, image_width=image_width, image_height=image_height, center_x=center_x, center_y=center_y, repeat_count_x=repeat_count_x, repeat_count_y=repeat_count_y)
 
     def update(self):
+        """ Updates the player sprite when user presses the appropriate keys
+        """
         self.center_x += self.change_x
         self.center_y += self.change_y
 
+        #boundary for the sides of the screen
         if self.left < 0:
             self.left = 0
         if self.right > settings.WIDTH:
             self.right = settings.WIDTH
 
+        #boundary for the top and bottom of the screen
         if self.bottom < 0:
             self.bottom = 3
         if self.top > settings.HEIGHT:
@@ -79,21 +85,22 @@ class Player(arcade.Sprite):
             self.right = 462
 
 class Puzzle:
-    
-    solution = [1, 4, 2, 3]
+    """ Controls the puzzle for this game.
+    """
+    solution = [1, 4, 2, 3] #Solution for this chapter
 
     def __init__(self):
-        self._puzzle = [] #to record the button press order
+        self._puzzle = [] #records the button press order
 
 
-    def clone_puzzle(self):
+    def clone_puzzle(self) -> List[int]:
         """ creates a clone of self._puzzle so it does not affect the recorded button press. 
         """
         self.clone = self._puzzle
         return self.clone
 
 
-    def add_value(self, value:int):
+    def add_value(self, value:int) -> List[int]:
         """ adds the button value that was pressed
         Arg:
             value is the order number for the buttons 
@@ -101,7 +108,7 @@ class Puzzle:
         self._puzzle.append(value)
 
 
-    def remove_value(self, value: int):
+    def remove_value(self, value: int) -> List[int]:
         """ removes the button value that was unpressed
         Arg:
             value is the order number for the buttons 
@@ -110,7 +117,7 @@ class Puzzle:
             if num is value:
                 return self._puzzle.pop(i)
 
-    def give_puzzle(self):
+    def give_puzzle(self) -> List[int]:
         """ gives the list that is self._puzzle
         return:
             self._puzzle
@@ -118,7 +125,7 @@ class Puzzle:
         return self._puzzle
 
 
-    def value_checker(self, puzzle: List[int], value: int):
+    def value_checker(self, puzzle: List[int], value: int) -> bool:
         """ Checks whether or not a button is pressed and their order number is recorded
         Arg:
             puzzle: the list that contains the order of the buttons that are currently pressed
@@ -141,7 +148,7 @@ class Puzzle:
         return left or right
     
 
-    def checker(self):
+    def checker(self) -> bool:
         """ Checks if the puzzle is solved and the buttons are all pressed in the right order
         """
         if self._puzzle == Puzzle.solution:
@@ -271,10 +278,10 @@ class Ch3View(arcade.View):
         self.background = arcade.load_texture("Sprites/brown-stone-seamless-background-vector-illustration-game-texture-68967465.jpg")
         self.riddle = Riddle("Sprites\DialogueBox.png", 1, 0, 0, 0, 0, settings.WIDTH / 2, settings.HEIGHT / 2 - 100)
         self.star_sprites = arcade.SpriteList()
-        self.x = 0
-        self.star_1 = 0
-        self.star_2 = 0
-        self.star_3 = 0
+        self.x = 0 # Controls whether or not the riddle is shown
+        self.star_1 = 0 # Controls whether or not the star sprites spawns
+        self.star_2 = 0 # Controls whether or not the star sprites spawns
+        self.star_3 = 0 # Controls whether or not the star sprites spawns
         self.score = 0
 
     def button_on(self, value: int):
@@ -295,7 +302,7 @@ class Ch3View(arcade.View):
         elif value is 4:    
             self.button_4 = arcade.Sprite(settings.button_pressed, .7, 0 ,0, 0, 0, 750, 75)
 
-    def button_off(self, value): 
+    def button_off(self, value: int): 
         """ creates the different off button sprites for the give value
 
         Arg:
@@ -331,6 +338,8 @@ class Ch3View(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(self.half_width, self.half_height, settings.WIDTH, settings.HEIGHT, self.background)
+
+        #Creates walls for the map
         arcade.draw_rectangle_filled(250, 450, 125, 25, arcade.color.BRASS)
         arcade.draw_rectangle_filled(200, 400, 25, 125, arcade.color.BRASS)
         arcade.draw_rectangle_filled(250, 100, 125, 25, arcade.color.BRASS)
@@ -339,6 +348,7 @@ class Ch3View(arcade.View):
         arcade.draw_rectangle_filled(575, 400, 25, 125, arcade.color.BRASS)
         arcade.draw_rectangle_filled(525, 100, 125, 25, arcade.color.BRASS)
         arcade.draw_rectangle_filled(575, 150, 25, 125, arcade.color.BRASS)
+
         self.text_sprite.draw()
         self.button_1.draw()
         self.button_2.draw()
@@ -521,6 +531,7 @@ class Scoreboard(arcade.View):
 
         keys = []
 
+        # Turns the time into decimal time and adds it to the list keys
         for key, value in self.game.items():
             (m, s) = key.split(':')
             result = int(m) * 60 + int(s)
@@ -530,7 +541,7 @@ class Scoreboard(arcade.View):
         self.new_keys = self.sort_scores(keys)
         self.new_game = {}
         
-
+        #Turns the decimal time back to time and adds it back to Chapter_3_scores.json
         for j in self.new_keys:
             m, s = divmod(j, 60)
             time = f"{m:02d}:{s:02d}"
@@ -539,7 +550,12 @@ class Scoreboard(arcade.View):
         with open("Chapter_3_score.json", 'w') as f:
              json.dump(self.new_game, f)
             
-    def sort_scores(self, data: List[int]):
+    def sort_scores(self, data: List[int]) -> List[int]:
+        """ Quick sorts the keys of Chapter_3_scores.json
+        Arg:
+            data: List of keys as integers 
+        """
+        #Base Case
         if len(data) < 2:
             return data
         
@@ -566,14 +582,17 @@ class Scoreboard(arcade.View):
                         anchor_x="center", anchor_y="center")
 
         placement = 1
-        h = 150
-        if len(game) >= 5:
+        h = 150 # Controls the Height of the text
+        #Checks if there are more than five scores in the json file 
+        if len(game) > 5:
+            #loops through the dictionary for the first 5 scores and places it on the screen
             while placement < 5:
                 for key, value in game.items():
                     arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}", -100, self.half_height + h, arcade.color.BLACK, 15, 1000,    "center", 'arial', True)
                     placement += 1
-                    h -= 50
+                    h -= 50 #Change in Height
         else:
+           #loops through the dictionary and places it on the screen
            for key, value in game.items():
                 arcade.draw_text(f"{placement}. Time: {key}, Star Score: {game[key]}", -100, self.half_height + h, arcade.color.BLACK, 15, 1000,    "center", 'arial', True)
                 placement += 1
@@ -599,11 +618,11 @@ if __name__ == "__main__":
     """
     from utils import FakeDirector
     window = arcade.Window(settings.WIDTH, settings.HEIGHT)
-    # my_view = ch3_MenuView()
+    my_view = ch3_MenuView()
     # my_view = Instructions()
     # my_view = Ch3View()
     # my_view = WinView()
-    my_view = Scoreboard()
+    # my_view = Scoreboard()
     my_view.director = FakeDirector(close_on_next_view=True)
     window.show_view(my_view)
     arcade.run()
