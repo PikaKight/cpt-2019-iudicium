@@ -4,10 +4,10 @@ Program description. Replace with description of your program. Give a descriptio
 
 ### Group Members:
 
-- Marcus Tuen Muk
-- Stella Hong
-- Yunze Li
-- Ziang Wang
+- Marcus Tuen Muk - Ch. 3
+- Stella Hong - Ch. 4
+- Yunze Li - Ch. 2
+- Ziang Wang -Ch. 1
 
 # CPT 2019
 
